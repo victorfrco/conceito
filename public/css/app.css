@@ -4615,7 +4615,7 @@ tbody.collapse.in {
   clear: both;
   font-weight: normal;
   line-height: 1.6;
-  color: #333333;
+  color: #c8b90c;
   white-space: nowrap;
 }
 
@@ -5661,6 +5661,7 @@ tbody.collapse.in {
   margin-top: 0;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000), color-stop(100%, #7a0f14)) !important;
 }
 
 .navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {
@@ -5717,7 +5718,7 @@ tbody.collapse.in {
 }
 
 .navbar-default {
-  background-color: #fff;
+  background-color: #000000;
   border-color: #d3e0e9;
 }
 
@@ -5749,7 +5750,7 @@ tbody.collapse.in {
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
   color: #555;
-  background-color: #eeeeee;
+  background-color: #000000;
 }
 
 .navbar-default .navbar-nav > .disabled > a,
