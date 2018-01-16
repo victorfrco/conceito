@@ -87,7 +87,7 @@ class SellController extends Controller
 
     public function codBarra(Request $request){
     	$product = $request->get('product_barcode');
-    	$product = Product::where('barcode', '=', $product)->first();
+    	$product = Product::where('barcode', '=', $product)->whereNotNull('barcode')->first();
 	    $order = Order::find( $request->toArray()['order_id']);
 	    if($product != null){
 	    	$product->qtd--;
@@ -125,7 +125,7 @@ class SellController extends Controller
 				$item->order_id = $order->id;
 				$item->save();
 				$order->total += $item->total;
-				$order->absolute_total += $item->total;
+				$order->absolut_total += $item->total;
 				$order->update();
 			}
 	    }else{
@@ -206,7 +206,7 @@ class SellController extends Controller
                         <td style="text-align: center" form="form-add-order">'.
                 \Bootstrapper\Facades\Button::appendIcon(\Bootstrapper\Facades\Icon::plus())->withAttributes(
                     ['class' => 'btn btn-xs', 'onclick' => "incrementaProduto($product->id)"]).
-                       '&nbsp;&nbsp;&nbsp;&nbsp;<input id="'.$product->id.'"  min="0" style="width:60px" class="form" name="'.$product->id.'" type="number" value="0">&nbsp;&nbsp;&nbsp;&nbsp;'.
+                       '&nbsp;&nbsp;<input id="'.$product->id.'"  min="0" style="width:60px" class="form" name="'.$product->id.'" type="number" value="0">&nbsp;&nbsp;'.
                \Bootstrapper\Facades\Button::appendIcon(\Bootstrapper\Facades\Icon::minus())->withAttributes(
                     ['class' => 'btn btn-xs', 'onclick' => "decrementaProduto($product->id)"]).'
                                 
