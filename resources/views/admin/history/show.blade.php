@@ -11,6 +11,7 @@
                     echo '<li><u>Última Modificação:</u> '.$dados['ultimaAtualizacao'].'</li>';
                     echo '<li><u> Venda Realizada por:</u> '.$dados['usuarioResponsavel'].'</li>';
                     echo '<li><u> Valor total da venda:</u> R$'.number_format((float)$dados['vlrTotal'], 2, ',', '').'</li>';
+                    echo '<li><u> Valor Desconto:</u> R$'.number_format((float)$dados['vlrDesconto'], 2, ',', '').'</li>';
                     echo '<li><u> Forma de Pagamento:</u> '.$dados['formaDePagamento'].'</li>';
                     echo '</ul>';
 

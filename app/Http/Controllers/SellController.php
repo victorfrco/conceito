@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Sell;
 use App\Models\PartialOrder;
+use function array_key_exists;
 use function array_push;
 use Auth;
 use Bootstrapper\Facades\Modal;
@@ -221,12 +222,16 @@ class SellController extends Controller
     }
 
     public function concluirVenda(Request $request){
-    	dd($request->toArray());
         $order = Order::find($request->toArray()['order_id']);
         $order->pay_method = $request->toArray()['formaPagamento'];
 
         if($order->pay_method == 4)
             $order->obs = $request->toArray()['obs'];
+
+	    if(array_key_exists('valorDesconto', $request->toArray())) {
+		    $order->discount = $request->toArray()['valorDesconto'];
+	        $order->total -= $order->discount;
+	    }
 
         $order->status = $this->STATUS_PAGA;
         $order->update();
