@@ -221,6 +221,7 @@ class SellController extends Controller
     }
 
     public function concluirVenda(Request $request){
+    	dd($request->toArray());
         $order = Order::find($request->toArray()['order_id']);
         $order->pay_method = $request->toArray()['formaPagamento'];
 
