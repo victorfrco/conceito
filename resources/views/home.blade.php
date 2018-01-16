@@ -220,7 +220,7 @@
                             echo Form::hidden('order_id', $order->id);
                             echo Form::hidden('formaPagamento', 4);
                         }else
-                        echo 'Não existe pedido em aberto!';
+                            echo 'Não existe pedido em aberto!';
                         }
                         else{
                         echo '<br><p style="display:inline; vertical-align: middle;font-weight: bold">Selecione a forma de pagamento: </p>
@@ -277,12 +277,11 @@
                     </select>
                     <div id="troco" style="display: none;">
                         @if(isset($order))
-                        Valor da venda (R$): <input style="width: 90px" type="text" id="num1" value="{{$order->total}}" disabled="true" />
-                        <br>
+                            Valor da venda (R$): <input style="width: 90px" type="text" id="num1" value="{{$order->total}}" disabled="true" />
+                            <br>
                         @endif
                         Valor entregue: <input style="margin-left: 41px; width: 90px" type="text" id="num2" onblur="calcular();" />
                         <br>
-                        <span id="resultado"></span>
                     </div>
                     <div id="obsTotal" style="display: none; width:500px">
                         @if(isset($order))
@@ -292,6 +291,10 @@
                         Informe uma observação:
                         <textarea name="obs" style="width:500px"></textarea>
                     </div>
+                    <div id="valorDesconto" style="display: none;">
+                        Desconto(R$) <input style="width: 90px"; id="num3" name="valorDesconto" type="text" step="0.01" onblur="calcular();">
+                    </div>
+                    <span id="resultado"></span>
                     @php
                         if(isset($order)){
                             echo Form::hidden('order_id', $order->id);
@@ -299,6 +302,7 @@
                     @endphp
                 </div>
                 <div class="modal-footer">
+                    <p style="display: inline; margin-right: 70px">Clique <a onclick='mostraDesconto()'>clique aqui </a> para aplicar desconto!</p>
                     {!! Form::submit('Concluir!', array('class' => 'btn btn-success')) !!}
                     {!! Form::close() !!}
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
@@ -432,8 +436,9 @@
         function calcular() {
             var num1 = Number(document.getElementById("num1").value);
             var num2 = Number(document.getElementById("num2").value);
+            var num3 = Number(document.getElementById("num3").value);
             var elemResult = document.getElementById("resultado");
-            var sub = num2 - num1;
+            var sub = num2 - num1 + num3;
 
             if (elemResult.textContent === undefined) {
                 elemResult.textContent = "Troco (R$): " + sub.toFixed(2) + "";
@@ -441,6 +446,9 @@
             else { // IE
                 elemResult.innerText = "Troco (R$): " + sub.toFixed(2) + "";
             }
+        }
+        function mostraDesconto(){
+            document.getElementById('valorDesconto').style.display = 'block';
         }
 
     </script>

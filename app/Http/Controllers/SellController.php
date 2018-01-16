@@ -39,75 +39,8 @@ class SellController extends Controller
         return view('admin.sells.index', compact('categories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Sell  $sell
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Sell $sell)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Sell  $sell
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Sell $sell)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Sell  $sell
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Sell $sell)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Sell  $sell
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Sell $sell)
-    {
-        //
-    }
-
     //aplica ou remove preço de associado a uma venda
 	public function aplicarRemoverDesconto(Request $request){
-//		dd($request->toArray());
 		$order = Order::find($request->get('order_id'));
 		if(!$order->associated) {
 			$this->recebeDesconto($order, true);
@@ -116,7 +49,7 @@ class SellController extends Controller
 			$this->recebeDesconto($order, false);
 		}
 
-		$order->save();
+		$order->update();
 		$categories = Category::all();
 
 		return view('home', compact('order', 'categories'));
@@ -130,9 +63,9 @@ class SellController extends Controller
 	    $categories = Category::all();
 
 	    $product->qtd += $item->qtd;
-	    $product->save();
+	    $product->update();
+	    $order = $this->atualizaPedido($item);
 	    $item->delete();
-	    $order = $this->atualizaPedido($item->order_id);
 
 	    return view('home', compact('order', 'categories'));
     }
@@ -141,6 +74,8 @@ class SellController extends Controller
         $order = new Order();
         $order->client_id = $request->toArray()['client_id'];
         $order->total = 0;
+        $order->absolut_total = 0;
+        $order->discount = 0;
         $order->status = $this->STATUS_MESA;
         $order->associated = $request->toArray()['associated'];
         $order->user_id = Auth::user()->id;
@@ -150,44 +85,13 @@ class SellController extends Controller
         return redirect('home')->with(compact('order', 'categories'));
     }
 
-    public function vinculaItensNoPedido(Order $pedido, array $itens)
-    {
-        if($pedido->id == null)
-            $pedido->save();
-        else{
-            $pedidoAntigo = Order::find($pedido->id);
-            $pedidoAntigo->total += $pedido->total;
-            $pedidoAntigo->save();
-        }
-        foreach($itens as $item){
-            if ($item->qtd > 0){
-                $item->order_id = $pedido->id;
-                $itemAntigo = Item::where([
-                    ['order_id', '=', $item->order_id],
-                    ['product_id', '=', $item->product_id]
-                ])->get();
-                if($itemAntigo->isNotEmpty())
-                {
-                    $itemAntigo[0]->qtd += $item->qtd;
-                    $itemAntigo[0]->total += $item->total;
-                    $itemAntigo[0]->save();
-                }else
-                    $item->save();
-            }
-            $product = Product::find($item->product_id);
-            $product->qtd -= $item->qtd;
-            $product->save();
-        }
-        return $pedido->id;
-    }
-
     public function codBarra(Request $request){
     	$product = $request->get('product_barcode');
     	$product = Product::where('barcode', '=', $product)->first();
+	    $order = Order::find( $request->toArray()['order_id']);
 	    if($product != null){
 	    	$product->qtd--;
 	    	$product->update();
-		    $order = Order::find( $request->toArray()['order_id']);
 
 			//verifica se ja existe um item com esse produto nesse pedido;
 		    $item = Item::where('order_id', '=', $order->id)->where('product_id','=', $product->id)->first();
@@ -200,10 +104,12 @@ class SellController extends Controller
 				if($order->associated) {
 					$item->total += $product->price_discount;
 					$order->total += $product->price_discount;
+					$order->absolut_total += $product->price_discount;
 				}
 				else {
 					$item->total += $product->price_resale;
 					$order->total += $product->price_resale;
+					$order->absolut_total += $product->price_resale;
 				}
 				$item->update();
 				$order->update();
@@ -219,58 +125,58 @@ class SellController extends Controller
 				$item->order_id = $order->id;
 				$item->save();
 				$order->total += $item->total;
+				$order->absolute_total += $item->total;
 				$order->update();
 			}
 	    }else{
-		    if(array_key_exists( 'order_id' , $request->toArray())) {
-			    $order = Order::find( $request->toArray()['order_id'] )->first();
-			    if ( $order->exists() ) {
-				    return redirect()->back()->with( 'inexistente', $order )->with( compact( 'order' ) );
-			    } else {
-				    return redirect()->back()->with( 'inexistente', '' );
-			    }
+		    if ( $order != null ) {
+			    return redirect()->back()->with( 'inexistente', $order )->with( compact( 'order' ) );
+		    } else {
+			    return redirect()->back()->with( 'inexistente', '' );
 		    }
 	    }
-	    if(array_key_exists( 'order_id' , $request->toArray()))
-		    $order = Order::find( $request->toArray()['order_id']);
 	    $categories = Category::all();
-
 	    return view('home', compact('order', 'categories'));
     }
 
     public function addProducts(Request $request)
     {
-        $items = [];
-        $valorTotal = 0;
-        $order = new Order();
-        if(array_key_exists( 'order_id' , $request->toArray()))
-            $order = Order::find($request->toArray()['order_id']);
-        else {
-            $order->client_id = Client::find(1)->id;
-            $order->associated = 0;
-            $order->status = $this->STATUS_EM_ABERTO;
-            $order->user_id = Auth::user()->id;
-        }
-        $order->total = 0;
-
+        $order = Order::find($request->toArray()['order_id']);
         foreach ($request->toArray() as $produto => $quantidade){
-
-            if($produto != "_token" && $produto != "order_id") {
-                $item = new Item();
-                $item->product_id = $produto;
-                if($order->associated == 0)
-                    $item->total = $quantidade * Product::find($produto)->price_resale;
-                else
-                    $item->total = $quantidade * Product::find($produto)->price_discount;
-                $item->qtd = $quantidade;
-                $item->order_id = $order->id;
-                array_push($items, $item);
-                $valorTotal += $item->total;
+            if($produto != "_token" && $produto != "order_id" && $quantidade > 0) {
+            	$produto = Product::find($produto);
+            	$produto->qtd -= $quantidade;
+            	$item = $this->verificaItemExistente($order->id, $produto->id);
+            	if($item == null) {
+            		$item = new Item();
+					$item->product_id = $produto->id;
+					$item->qtd = $quantidade;
+		            if($order->associated == 0)
+			            $item->total = $quantidade * $produto->price_resale;
+		            else
+			            $item->total = $quantidade * $produto->price_discount;
+		            $item->order_id = $order->id;
+		            $item->save();
+		            $order->total += $item->total;
+		            $order->absolut_total += $item->total;
+	            }else{
+            		$item->qtd += $quantidade;
+		            if($order->associated == 0) {
+			            $item->total += $quantidade * $produto->price_resale;
+			            $order->total += $quantidade * $produto->price_resale;
+			            $order->absolut_total += $quantidade * $produto->price_resale;
+		            }
+		            else {
+			            $item->total += $quantidade * $produto->price_discount;
+			            $order->total += $quantidade * $produto->price_discount;
+			            $order->absolut_total += $quantidade * $produto->price_discount;
+		            }
+		            $item->update();
+	            }
             }
         }
-        $order->total += $valorTotal;
-        $order = Order::find($this->vinculaItensNoPedido($order, $items));
-	    $categories = Category::all();
+	    $order->update();
+        $categories = Category::all();
 	    return view('home', compact('order', 'categories'));
     }
 
@@ -341,7 +247,7 @@ class SellController extends Controller
         foreach ($itens as $item){
             $product = Product::find($item->product_id);
             $product->qtd += $item->qtd;
-            $product->save();
+            $product->update();
         }
 
     }
@@ -358,9 +264,11 @@ class SellController extends Controller
 			    $item->total = $item->qtd * Product::find( $item->product_id )->price_resale;
 			    $order->associated = 0;
 		    }
-		    $item->save();
+		    $item->update();
 		    $total += $item->total;
 	    }
+	    $order->absolut_total = $total;
+
 	    $pago = OrderController::valorPago($order);
         $total -= $pago;
 	    $order->total = $total;
@@ -368,17 +276,12 @@ class SellController extends Controller
         return $order;
     }
 
-    private function atualizaPedido($id){
-	    $itens = Item::all()->where('order_id', '=', $id);
-		$order = Order::find($id);
-		$total = 0;
+    private function atualizaPedido($item){
+	    $order = Order::find($item->order_id);
+	    $order->total -= $item->total;
+	    $order->absolut_total -= $item->total;
 
-		foreach ($itens as $item){
-			$product = Product::find($item->product_id);
-			$total += $item->qtd * $product->price_resale;
-		}
-		$order->total = $total;
-	    $order->save();
+	    $order->update();
     	return $order;
     }
 
@@ -509,5 +412,10 @@ class SellController extends Controller
         $order = $orderOriginal;
 		$categories = Category::all();
 		return view('home', compact('order', 'categories'));
+	}
+
+	private function verificaItemExistente($order_id, $product_id) {
+		$item = Item::where('order_id', '=', $order_id)->where('product_id','=', $product_id)->first();
+		return $item;
 	}
 }
