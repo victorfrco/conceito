@@ -66,6 +66,7 @@ Route::prefix('admin')->group(function(){
         Route::resource('clients','ClientController');
         Route::resource('sells', 'SellController');
 	    Route::resource('providers', 'ProviderController');
+	    Route::resource('bonifications', 'BonificationController');
     });
 });
 

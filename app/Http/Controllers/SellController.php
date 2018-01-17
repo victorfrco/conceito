@@ -225,6 +225,9 @@ class SellController extends Controller
         $order = Order::find($request->toArray()['order_id']);
         $order->pay_method = $request->toArray()['formaPagamento'];
 
+        if($request->get('user_id') != null)
+        	$order->user_id = $request->get('user_id');
+
         if($order->pay_method == 4)
             $order->obs = $request->toArray()['obs'];
 
@@ -274,9 +277,8 @@ class SellController extends Controller
 		    $total += $item->total;
 	    }
 	    $order->absolut_total = $total;
+	    $order->absolut_total += OrderController::valorTotalSubVendas($order);
 
-	    $pago = OrderController::valorPago($order);
-        $total -= $pago;
 	    $order->total = $total;
 
         return $order;
@@ -371,7 +373,7 @@ class SellController extends Controller
 
 		$totalItensRemovidos = 0;
 		foreach ($request->toArray() as $item => $quantidade){
-			if($item != "valorPago" && $item != "obsParcial" && $item != "_token" && $item != "order_id" && $item != "formaPagamento" && $quantidade != 0) {
+			if($item != "valorPago" && $item != "user_id" && $item != "obsParcial" && $item != "_token" && $item != "order_id" && $item != "formaPagamento" && $quantidade != 0) {
 				$itemOriginal = Item::find($item);
 				$valorDoItem = $itemOriginal->total / $itemOriginal->qtd;
 				if($itemOriginal->qtd > $quantidade){
@@ -404,9 +406,13 @@ class SellController extends Controller
 		}
 
 		$orderOriginal->total -= $totalItensRemovidos;
+		if($request->get('user_id') != null) {
+			$parcial->user_id = $request->get( 'user_id' );
+			$orderOriginal->user_id = $request->get( 'user_id' );
+		}
 		$parcial->save();
 		$orderOriginal->status = $this->STATUS_PAGA_PARCIALMENTE;
-		$orderOriginal->save();
+		$orderOriginal->update();
 		
 		//verificar se a ordem de origem ainda possui itens, senão deve-se colocá-la como paga
 		if(Item::all()->where('order_id', '=', $orderOriginal->id)->isEmpty()){

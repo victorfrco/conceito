@@ -47,7 +47,7 @@
                     ],
                     ['link' => route('admin.clients.index'), 'title' => 'Clientes'],
                     ['link' => route('estoque'), 'title' => 'Estoque'],
-                    ['link' => '#', 'title' => 'Bonificação'],
+                    ['link' => route('admin.bonifications.index'), 'title' => 'Bonificação'],
                     ['link' => route('history'), 'title' => 'Histórico']
                 ];
             }
