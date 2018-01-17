@@ -49,13 +49,13 @@ class Product extends Model implements TableInterface
                 return $this->description;
                 break;
             case 'Preço de Custo':
-                return 'R$ '.number_format((float)$this->price_cost, 2, '.', '');
+                return 'R$ '.number_format((float)$this->price_cost, 2, ',', '.');
                 break;
             case 'Preço de Venda':
-	            return 'R$ '.number_format((float)$this->price_resale, 2, '.', '');
+	            return 'R$ '.number_format((float)$this->price_resale, 2, ',', '.');
                 break;
             case 'Preço Associado':
-	            return 'R$ '.number_format((float)$this->price_discount, 2, '.', '');
+	            return 'R$ '.number_format((float)$this->price_discount, 2, ',', '.');
                 break;
 	        case 'Estoque':
 		        return $this->qtd;
