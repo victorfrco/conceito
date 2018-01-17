@@ -26,7 +26,7 @@ class Product extends Model implements TableInterface
      */
     public function getTableHeaders()
     {
-        return ['Id', 'Nome', 'Descrição', 'Preço de Custo', 'Preço de Venda', 'Preço Associado', 'Preço Cartão', 'Estoque', 'Código de Barras'];
+        return ['Id', 'Nome', 'Preço de Custo', 'Preço de Venda', 'Preço Associado', 'Preço Cartão', 'Estoque', 'Código de Barras'];
     }
 
     /**
@@ -44,9 +44,6 @@ class Product extends Model implements TableInterface
                 break;
             case 'Nome':
                 return $this->name;
-                break;
-            case 'Descrição':
-                return $this->description;
                 break;
             case 'Preço de Custo':
                 return 'R$ '.number_format($this->price_cost, 2, ',', '.');
