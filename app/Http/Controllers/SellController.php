@@ -39,8 +39,7 @@ class SellController extends Controller
         $categories = Category::all();
         return view('admin.sells.index', compact('categories'));
     }
-
-    //aplica ou remove preço de associado a uma venda
+	//aplica ou remove preço de associado a uma venda
 	public function aplicarRemoverDesconto(Request $request){
 		$order = Order::find($request->get('order_id'));
 		if(!$order->associated) {
@@ -56,6 +55,22 @@ class SellController extends Controller
 		return view('home', compact('order', 'categories'));
 	}
 
+	//aplica ou remove preço de cartao de credito a uma venda
+	public function aplicarRemoverCartao(Request $request){
+		$order = Order::find($request->get('order_id'));
+		$aplica = $request->get('aplica');
+		if($aplica) {
+			$this->aplicaCartao($order, true);
+		}
+		else{
+			$this->aplicaCartao($order, false);
+		}
+
+		$order->update();
+		$categories = Category::all();
+
+		return view('home', compact('order', 'categories'));
+	}
 
     //exclui item do pedido e devolve a quantidade ao estoque;
     public function removeItem(Request $request){
@@ -238,6 +253,9 @@ class SellController extends Controller
 
         $order->status = $this->STATUS_PAGA;
         $order->update();
+
+        $moveController = new MoveController();
+	    $moveController->registraBaixaTotal($order, 2);
         return Redirect::to('/home')->with('vendaRealizada', 'Venda realizada com sucesso!');
     }
 
@@ -350,10 +368,6 @@ class SellController extends Controller
             $parcial->total = $request->toArray()['valorPago'];
             $parcial->obs = $request->toArray()['obsParcial'];
             $orderOriginal->total -= $parcial->total;
-            if($orderOriginal->total < 1)
-                $orderOriginal->status = $this->STATUS_PAGA;
-            else
-                $orderOriginal->status = $this->STATUS_PAGA_PARCIALMENTE;
 
             if($orderOriginal->total < 1){
                 $orderOriginal->status = $this->STATUS_PAGA;
@@ -361,7 +375,9 @@ class SellController extends Controller
                 $parcial->save();
                 $categories = Category::all();
                 return view('home', compact('order', 'categories'));
-            }
+            }else
+	            $orderOriginal->status = $this->STATUS_PAGA_PARCIALMENTE;
+
             $orderOriginal->update();
             $parcial->save();
 
@@ -405,6 +421,9 @@ class SellController extends Controller
 			}
 		}
 
+		$moveController = new MoveController();
+		$moveController->registraBaixaTotal($parcial, 2);
+
 		$orderOriginal->total -= $totalItensRemovidos;
 		if($request->get('user_id') != null) {
 			$parcial->user_id = $request->get( 'user_id' );
@@ -429,5 +448,27 @@ class SellController extends Controller
 	private function verificaItemExistente($order_id, $product_id) {
 		$item = Item::where('order_id', '=', $order_id)->where('product_id','=', $product_id)->first();
 		return $item;
+	}
+
+	private function aplicaCartao(Order $order, $aplica){
+		$total = 0;
+		foreach ($order->itens()->get() as $item){
+			if($aplica) {
+				$item->total = $item->qtd * Product::find( $item->product_id )->price_card;
+				$order->pay_method = 3;
+			}
+			else{
+				$item->total = $item->qtd * Product::find( $item->product_id )->price_resale;
+				$order->pay_method = null;
+			}
+			$item->update();
+			$total += $item->total;
+		}
+		$order->absolut_total = $total;
+		$order->absolut_total += OrderController::valorTotalSubVendas($order);
+
+		$order->total = $total;
+		$order->associated = 0;
+		return $order;
 	}
 }

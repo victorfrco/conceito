@@ -52,6 +52,10 @@ class BonificationController {
 		$bonificacao->user_id = Auth::id();
 
 		$bonificacao->save();
+
+		$moveController = new MoveController();
+		$moveController->registraBonificacao($bonificacao, 2);
+
 		return redirect()->back();
 	}
 }

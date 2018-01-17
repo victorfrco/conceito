@@ -28,11 +28,11 @@ class ClientForm extends Form
 	        ])
 	        ->add('cpf', 'text', [
 		        'label' => 'CPF',
-		        'rules' => "max:11|unique:clients,cpf,{$id}"
+		        'rules' => "max:11"
 	        ])
 	        ->add('cnpj', 'text', [
 		        'label' => 'CNPJ',
-		        'rules' => "max:16"
+		        'rules' => "max:18"
 	        ])
 	        ->add('adr_street', 'text', [
 		        'label' => 'Rua'
@@ -47,7 +47,8 @@ class ClientForm extends Form
 		        'label' => 'Bairro'
 	        ])
 	        ->add('adr_cep', 'text', [
-		        'label' => 'CEP'
+		        'label' => 'CEP',
+		        'rules' => 'max:8'
 	        ])
 	        ->add('obs', 'text', [
 		        'label' => 'Observação'
