@@ -30,7 +30,7 @@ class OrderController extends Controller
         $lista =[];
         $categories = Category::all();
         foreach ($pedidos as $order) {
-            $div = Button::primary($order->client->name)->withAttributes([
+            $div = Button::primary($order->client->nickname)->withAttributes([
                         'id' => $order->id,
                         'style' =>
                                    'min-width: 100px;
