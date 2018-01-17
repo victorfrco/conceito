@@ -71,6 +71,16 @@
                     }
                 }
                 echo Bootstrapper\Facades\Accordion::named("basic")->withContents($names);
+
+                if(App\Http\Controllers\OrderController::possuiBonificacao($order)){
+                    echo '<h2>Bonificações</h2>';
+                    $bonificacoes = App\Http\Controllers\OrderController::bonificacoes($order);
+                    echo '<ul>';
+                    foreach ($bonificacoes as $bonificacao){
+                        echo '<li>'.$bonificacao->getValueForHeader('Qtd.').' '.$bonificacao->getValueForHeader('Item').' - '.$bonificacao->getValueForHeader('Valor Total').'</li>';
+                    }
+                    echo '</ul>';
+                }
                 @endphp
             @else
             <h4>Nenhuma venda realizada!</h4>

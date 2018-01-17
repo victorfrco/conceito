@@ -24,7 +24,7 @@ class Bonification extends Model implements TableInterface {
 	 * @return array
 	 */
 	public function getTableHeaders() {
-		return ['Id', 'Vendedor', 'Cliente', 'Item', 'Valor', 'Data', 'Logo'];
+		return ['Id', 'Vendedor', 'Cliente', 'Item', 'Qtd.', 'Valor Total', 'Data'];
 	}
 
 	/**
@@ -51,16 +51,20 @@ class Bonification extends Model implements TableInterface {
 				$product = Product::find($item->product_id);
 				return $product->name;
 				break;
-			case 'Valor':
+			case 'Qtd.':
 				$item = Item::find($this->item_id);
-				$product = Product::find($item->product_id);
-				return 'R$ '.number_format((float)$product->price_cost, 2, ',', '.');
+				return $item->qtd;
+				break;
+			case 'Valor Total':
+				$item = Item::find($this->item_id);
+				return 'R$ '.number_format($item->total, 2, ',', '.');
 				break;
 			case 'Id. Venda':
-				return $this->logo_id;
+				return $this->order_id;
 				break;
 			case 'Data':
-				return $this->logo_id;
+				$dataFormatada = new \DateTime($this->created_at);
+				return $dataFormatada->format('d/m/Y H:i');
 				break;
 		}
 }}

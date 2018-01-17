@@ -19,7 +19,7 @@ class CreateItensTable extends Migration
 	        $table->decimal('total', 8,2)->nullable();
             $table->timestamps();
 
-            $table->unsignedInteger('order_id');
+            $table->unsignedInteger('order_id')->nullable();
             $table->unsignedInteger('product_id');
         });
     }
