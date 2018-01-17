@@ -17,6 +17,7 @@ use App\Models\Order;
 Route::post('/vendaParcial', 'SellController@vendaParcial');
 Route::any('/searchProduct', 'ProductController@search');
 Route::post('/associado','SellController@aplicarRemoverDesconto');
+Route::post('/cartao','SellController@aplicarRemoverCartao');
 Route::post('/admin/generateReport', 'ReportController@generateReport');
 Route::get('/admin/report', 'ReportController@index')->name('report');
 Route::post('/admin/addStock', 'ProductController@addStock');

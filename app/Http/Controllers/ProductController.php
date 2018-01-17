@@ -32,6 +32,9 @@ class ProductController extends Controller
 		$product->qtd += $request->toArray()['product_qtd'];
 		$product->save();
 
+		$moveController = new MoveController();
+		$moveController->registraEntradaIndividual($product, $request->toArray()['product_qtd'], 1);
+
 		$success = 'Produto adicionado ao estoque!';
 		return view('admin.products.stock', compact('success'));
 	}

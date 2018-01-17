@@ -51,6 +51,13 @@
             @else
                 {!! Button::primary(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true'])  !!}
             @endif
+            @if(isset($order) && $order->pay_method != '3')
+                {!! Button::success(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#confirmarCartaoModal'])  !!}
+            @elseif(isset($order) && $order->pay_method == '3')
+                {!! Button::danger(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerCartaoModal'])  !!}
+            @else
+                {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true'])  !!}
+            @endif
         </div>
         <div class="row">
             <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); overflow: auto; margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
@@ -394,6 +401,60 @@
                     @php
                         if(isset($order)){
                             echo Form::hidden('order_id', $order->id);
+                        }
+                    @endphp
+                    {!! Form::token() !!}
+                </div>
+                <div class="modal-footer">
+                    {!! Form::submit('Sim!', array('class' => 'btn btn-danger')) !!}
+                    {!! Form::close() !!}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="confirmarCartaoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Aplicar Taxa</h4>
+                </div>
+                {!! Form::open(array('action' => 'SellController@aplicarRemoverCartao', 'method' => 'post')) !!}
+                <div class="modal-body">
+                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja aplicar taxa de cartão de crédito para esta venda? </p>
+
+                    @php
+                        if(isset($order)){
+                            echo Form::hidden('order_id', $order->id);
+                            echo Form::hidden('aplica', 1);
+                        }
+                    @endphp
+                    {!! Form::token() !!}
+                </div>
+                <div class="modal-footer">
+                    {!! Form::submit('Sim!', array('class' => 'btn btn-success')) !!}
+                    {!! Form::close() !!}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="removerCartaoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Remover Taxa</h4>
+                </div>
+                {!! Form::open(array('action' => 'SellController@aplicarRemoverCartao', 'method' => 'post')) !!}
+                <div class="modal-body">
+                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja remover a taxa de cartão de crédito para esta venda? </p>
+
+                    @php
+                        if(isset($order)){
+                            echo Form::hidden('order_id', $order->id);
+                            echo Form::hidden('aplica', 0);
                         }
                     @endphp
                     {!! Form::token() !!}

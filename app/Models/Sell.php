@@ -25,8 +25,10 @@ class Sell extends Model
             $product = Product::find($item->product_id);
             if($order->associated == 1)
                 $price = $product->price_discount;
-            else
-                $price = $product->price_resale;
+            else if($order->pay_method == 3)
+                $price = $product->price_card;
+	        else
+	        	$price = $product->price_resale;
 
 
             $tupla = '      <tr>
