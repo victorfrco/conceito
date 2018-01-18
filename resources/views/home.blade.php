@@ -327,7 +327,7 @@
                     @endphp
                 </div>
                 <div class="modal-footer">
-                    <p style="display: inline; margin-right: 70px">Clique <a onclick='mostraDesconto()'>clique aqui </a> para aplicar desconto!</p>
+                    <p style="display: inline; margin-right: 70px">Clique <a onclick='mostraDesconto()'>AQUI</a> para aplicar desconto!</p>
                     {!! Form::submit('Concluir!', array('class' => 'btn btn-success')) !!}
                     {!! Form::close() !!}
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
