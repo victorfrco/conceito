@@ -162,25 +162,40 @@ class SellController extends Controller
             if($produto != "_token" && $produto != "order_id" && $quantidade > 0) {
             	$produto = Product::find($produto);
             	$produto->qtd -= $quantidade;
+            	$produto->update();
             	$item = $this->verificaItemExistente($order->id, $produto->id);
             	if($item == null) {
             		$item = new Item();
 					$item->product_id = $produto->id;
 					$item->qtd = $quantidade;
-		            if($order->associated == 0)
+
+					//preço de atacado/associado
+		            if($order->associated == 0 && $order->pay_method != 3)
 			            $item->total = $quantidade * $produto->price_resale;
+
+		            //preço de cartão de crédito
+		            else if($order->pay_method == 3)
+			            $item->total = $quantidade * $produto->price_card;
+
+		            //preço padrão
 		            else
 			            $item->total = $quantidade * $produto->price_discount;
+
 		            $item->order_id = $order->id;
 		            $item->save();
 		            $order->total += $item->total;
 		            $order->absolut_total += $item->total;
 	            }else{
             		$item->qtd += $quantidade;
-		            if($order->associated == 0) {
+		            if($order->associated == 0 && $order->pay_method != 3) {
 			            $item->total += $quantidade * $produto->price_resale;
 			            $order->total += $quantidade * $produto->price_resale;
 			            $order->absolut_total += $quantidade * $produto->price_resale;
+		            }
+		            else if($order->pay_method == 3) {
+			            $item->total += $quantidade * $produto->price_card;
+			            $order->total += $quantidade * $produto->price_card;
+			            $order->absolut_total += $quantidade * $produto->price_card;
 		            }
 		            else {
 			            $item->total += $quantidade * $produto->price_discount;
@@ -204,7 +219,8 @@ class SellController extends Controller
                         <th>Nome</th>
                         <th style="text-align: center">Estoque</th>
                         <th style="text-align: center">Preço</th>
-                        <th style="text-align: center">Associado</th>
+                        <th style="text-align: center">Atacado</th>
+                        <th style="text-align: center">Crédito</th>
                         <th style="text-align: center">Quantidade</th>
                     </tr>';
         $divFooter = '<input name="_token" type="hidden" value="'. csrf_token().'"/></table>';
@@ -215,9 +231,11 @@ class SellController extends Controller
                         <td style="text-align: center">
                         '.$product->qtd.'
                         </td>
-                        <td style="text-align: center">R$ '.$product->price_resale.'
+                        <td style="text-align: center">R$ '.number_format($product->price_resale, 2,',', '.').'
                         </td>
-                        <td style="text-align: center">R$ '.$product->price_discount.'
+                        <td style="text-align: center">R$ '.number_format($product->price_discount, 2,',', '.').'
+                        </td>
+                        <td style="text-align: center">R$ '.number_format($product->price_card, 2,',', '.').'
                         </td>
                         <td style="text-align: center" form="form-add-order">'.
                 \Bootstrapper\Facades\Button::appendIcon(\Bootstrapper\Facades\Icon::plus())->withAttributes(
@@ -330,7 +348,7 @@ class SellController extends Controller
                         </td>
                         <td style="text-align: center">'.$item->qtd.'
                         </td>
-                        <td style="text-align: center">R$'.$item->total/$item->qtd.'
+                        <td style="text-align: center">R$'.number_format($item->total/$item->qtd, 2,',', '.').'
                         </td>
                         <td style="text-align: center; min-width: 170px" form="form-add-order">'.
 			           \Bootstrapper\Facades\Button::appendIcon(\Bootstrapper\Facades\Icon::plus())->withAttributes(

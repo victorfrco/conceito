@@ -29,7 +29,7 @@
     @endif
     <div class="container">
         <div class="col-xs-7 col-sm-6 col-lg-7"  style="margin-left:-90px; margin-right: 130px; margin-bottom: 10px;">
-            {!! \Bootstrapper\Facades\Button::primary('Nova Mesa')->withAttributes(['class'=>'botao', 'data-toggle' => 'modal', 'data-target' => '#novaMesaModal']) !!}
+            {!! \Bootstrapper\Facades\Button::primary('Nova Venda')->withAttributes(['class'=>'botao', 'data-toggle' => 'modal', 'data-target' => '#novaMesaModal']) !!}
         </div>
         <div class="row" style="text-align: right">
             {!! Form::open(array('action' => 'SellController@codBarra', 'method' => 'post', 'style' => 'display:inline')) !!}
@@ -141,8 +141,8 @@
             @endphp
         </div>
     </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="productModal" tabindex="-1">
-        <div class="modal-dialog">
+    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="productModal" tabindex="-1" >
+        <div class="modal-dialog" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close" data-dismiss="modal">&times;</button>
@@ -200,7 +200,7 @@
         </div>
     </div>
     <div data-keyboard="false" data-backdrop="static" class="modal fade" id="vendaParcial" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog" style="width: 800px" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
