@@ -18,6 +18,19 @@ class ReportController extends Controller
     	return view('admin.reports.index');
     }
 
+    public function generateAnaliticReport(Request $request){
+        $date  = $request->toArray()['date'];
+        $dados = $this->buscaEntradasESaidas( $date );
+        if ( !$dados['entradas']->count() < 1 && !$dados['saidas']->count() < 1) {
+            $pdf = PDF::loadView( 'admin.reports.analitic', compact( 'dados' ) );
+
+            return $pdf->download( 'Entradas e Saidas_' . $dados['data'] . '.pdf' );
+        } else {
+            $request->session()->flash('message', 'Não existe nenhuma entrada ou saída na data informada!');
+            return redirect()->route('report');
+        }
+    }
+
     public function generateReport(Request $request) {
 	    $date  = $request->toArray()['date'];
 	    $dados = $this->buscaDadosPorData( $date );
@@ -107,4 +120,33 @@ class ReportController extends Controller
 //		return dd($dados);
 		return $dados;
 	}
+
+    private function buscaEntradasESaidas($date)
+    {
+        $dados = [];
+        $dataFormatada = new \DateTime($date);
+        $dados['data'] = $dataFormatada->format('d-m-Y');
+
+        /*SELECT P.ID, P.name, SUM(M.qtd) AS QTD, M.vlrUnit, (M.vlrUnit * SUM(M.qtd)) AS total FROM moves M
+        JOIN products P ON M.product_id = P.ID WHERE M.STATUS = 2
+  GROUP BY p.id, M.vlrUnit;*/
+        $dados['saidas'] = DB::table('moves')
+            ->join('products', 'moves.product_id', '=', 'products.id')
+            ->select(DB::raw('products.id, SUM(moves.qtd) AS qtd, moves.vlrUnit, (moves.vlrUnit * SUM(moves.qtd)) AS total,  products.name'))
+            ->where('moves.status', '=', 2)
+            ->whereDate('moves.updated_at','=', $date)
+            ->groupBy('products.id', 'products.name','moves.vlrUnit')
+            ->get();
+
+        $dados['entradas'] = DB::table('moves')
+            ->join('products', 'moves.product_id', '=', 'products.id')
+            ->select(DB::raw('products.id, SUM(moves.qtd) AS qtd, moves.vlrUnit, (moves.vlrUnit * SUM(moves.qtd)) AS total,  products.name'))
+            ->where('moves.status', '=', 1)
+            ->whereDate('moves.updated_at','=', $date)
+            ->groupBy('products.id', 'products.name','moves.vlrUnit')
+            ->get();
+
+//		return dd($dados);
+        return $dados;
+    }
 }
