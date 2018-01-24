@@ -256,6 +256,7 @@
                         <option value="2">Cartão de Débito</option>
                         <option value="3">Cartão de Crédito</option>
                         <option value="4">Múltiplo</option>
+                        <option value="5">Transferência/Depósito</option>
                     </select>
                     <div id="obsParcial" style="display: none; width:500px">';
                         if(isset($order))
@@ -306,6 +307,7 @@
                         <option value="2">Cartão de Débito</option>
                         <option value="3">Cartão de Crédito</option>
                         <option value="4">Múltiplo</option>
+                        <option value="5">Transferência/Depósito</option>
                     </select>
                     <div id="troco" style="display: none;">
                         @if(isset($order))
