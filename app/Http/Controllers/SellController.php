@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Sell;
-use App\Models\PartialOrder;
+use App\Models\Cash;
 use function array_key_exists;
 use function array_push;
 use Auth;
@@ -269,6 +269,12 @@ class SellController extends Controller
 	        $order->total -= $order->discount;
 	    }
 
+	    if($order->pay_method == 1){
+		    $cash = CashController::buscaCaixaPorUsuario(Auth::id());
+		    $cash->atual_value += $order->total;
+		    $cash->update();
+	    }
+
         $order->status = $this->STATUS_PAGA;
         $order->update();
 
@@ -450,6 +456,12 @@ class SellController extends Controller
 		$parcial->save();
 		$orderOriginal->status = $this->STATUS_PAGA_PARCIALMENTE;
 		$orderOriginal->update();
+
+		if($parcial->pay_method == 1){
+			$cash = CashController::buscaCaixaPorUsuario(Auth::id());
+			$cash->atual_value += $parcial->total;
+			$cash->update();
+		}
 		
 		//verificar se a ordem de origem ainda possui itens, senão deve-se colocá-la como paga
 		if(Item::all()->where('order_id', '=', $orderOriginal->id)->isEmpty()){
