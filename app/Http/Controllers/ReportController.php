@@ -18,6 +18,41 @@ class ReportController extends Controller
     	return view('admin.reports.index');
     }
 
+    public function generateSellReport(Request $request){
+    	$dados['dataInicial'] = $request->get('dateInicial');
+    	$dados['dataFinal'] = $request->get('dateFinal');
+
+    	$orderDao = new App\Dao\DaoOrder();
+    	$dados['qtdVendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 0)->count();
+    	$dados['vlrVendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 0)->sum('absolut_total');
+    	$dados['qtdVendasConcluidas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 3)->count();
+    	$dados['vlrVendasConcluidas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 3)->sum('absolut_total');
+    	$dados['qtdVendasCanceladas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 1)->count();
+    	$dados['vlrVendasCanceladas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 1)->sum('absolut_total');
+    	$dados['qtdVendasEmAberto'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 2)->count();
+    	$dados['vlrVendasEmAberto'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $request->get('dateFinal'), 2)->sum('absolut_total');
+    	$dados['qtdVendasDinheiro'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 1, $request->get('dateFinal'))->count();
+    	$dados['vlrVendasDinheiro'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 1, $request->get('dateFinal'))->sum('absolut_total');
+	    $dados['qtdVendasDebito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 2, $request->get('dateFinal'))->count();
+	    $dados['vlrVendasDebito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 2, $request->get('dateFinal'))->sum('absolut_total');
+    	$dados['qtdVendasCredito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 3, $request->get('dateFinal'))->count();
+    	$dados['vlrVendasCredito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 3, $request->get('dateFinal'))->sum('absolut_total');
+    	$dados['qtdVendasMultiplo'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 4, $request->get('dateFinal'))->count();
+    	$dados['vlrVendasMultiplo'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 4, $request->get('dateFinal'))->sum('absolut_total');
+    	$dados['qtdVendasDeposito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 5, $request->get('dateFinal'))->count();
+    	$dados['vlrVendasDeposito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 5, $request->get('dateFinal'))->sum('absolut_total');
+    	dd($dados);
+    }
+
+    public function generateUserReport(Request $request){
+	    $dados['dataInicial'] = $request->get('dateInicial');
+	    $dados['dataFinal'] = $request->get('dateFinal');
+
+	    $orderDao = new App\Dao\DaoOrder();
+	    $dados['vendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $request->get('dateFinal'))->count();
+	    dd($dados);
+    }
+
     public function generateAnaliticReport(Request $request){
 	    $date  = $request->toArray()['date'];
 	    $dados = $this->buscaEntradasESaidas( $date );
