@@ -7,8 +7,14 @@
         </div>
         @php
             $users = App\User::all();
-            foreach($users as $user)
-            $variavel = '<option value="'.$user->id.'">'.$user->name.'</option> </select>';
+            $usuarios = [];
+            foreach($users as $user){
+                $usuario = '<option value="'.$user->id.'">'.$user->name.'</option>';
+                array_push($usuarios, $usuario);
+            }
+            $end = '</select><br><br>';
+            array_push($usuarios, $end);
+            $usuarios = implode('',$usuarios);
             //todo
 
             echo Bootstrapper\Facades\Accordion::named("basic")->withContents([
@@ -51,9 +57,10 @@
                           '<br>Informe a data final:<br>'.
                           Form::date('dateFinal').'
                             <br>'.'
-                            <br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p>
+                            <br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p> <br>
                     <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">
-                        '.Form::submit('Enviar', ['class' => 'btn btn-primary']).''.
+                    '.$usuarios
+                    .Form::submit('Enviar', ['class' => 'btn btn-primary']).''.
                               Form::close().'',
 
             'style'=>''
@@ -64,4 +71,11 @@
 
         </div>
     </div>
+@endsection
+@section('scripts')
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+
 @endsection

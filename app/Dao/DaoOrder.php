@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Dao;
+use App\Models\Order;
 use Illuminate\Support\Facades\DB;
 
 /**
