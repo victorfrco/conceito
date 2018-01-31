@@ -3,20 +3,93 @@
 <head>
 </head>
 <body>
-<h2 align="center"> Relatório de Vendas - {{$dados['user']}}</h2>
-<h4 align="center"> Período: <span style="font-weight: bold">{{$dados['dataInicial']}}</span> à <span style="font-weight: bold">{{$dados['dataFinal']}}</span></h4>
+<h2 align="center"> Relatório de Vendas</h2>
+<h4 align="center"> Período: <span style="font-weight: bold">{{$dados['dataInicial']}}</span> à <span
+            style="font-weight: bold">{{$dados['dataFinal']}}</span></h4>
 
 <p><span style="font-weight: bold">Quantidade de Vendas :</span> {{$dados['qtdVendas']}}</p>
-<p><span style="font-weight: bold">Valor total de vendas :</span>R$ {{number_format($dados['vlrVendas'], 2, ',', '.')}}</p>
-<p><span style="font-weight: bold">Valor médio de vendas :</span>R$ {{number_format($dados['avgVendas'], 2, ',', '.')}}</p>
+<p><span style="font-weight: bold">Valor total das vendas :</span>R$ {{number_format($dados['vlrVendas'], 2, ',', '.')}}
+</p>
+<p><span style="font-weight: bold">Valor médio das vendas :</span>R$ {{number_format($dados['avgVendas'], 2, ',', '.')}}
+</p>
+<h4 align="center">Vendas Por Status</h4>
 <table class="table table-striped">
     <thead>
     <tr>
+        <th width="33%">Status</th>
+        <th width="33%">Quantidade</th>
+        <th width="34%">Valor Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Concluídas</th>
+        <th>{{$dados['qtdVendasConcluidas']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasConcluidas'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Canceladas</th>
+        <th>{{$dados['qtdVendasCanceladas']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasCanceladas'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Em aberto</th>
+        <th>{{$dados['qtdVendasEmAberto']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasEmAberto'], 2, ',', '.')}}</th>
+    </tr>
+    </tbody>
+</table>
+
+<h4 align="center">Vendas Por Forma de Pagamento</h4>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th width="33%">Status</th>
+        <th width="33%">Quantidade</th>
+        <th width="34%">Valor Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>Dinheiro</th>
+        <th>{{$dados['qtdVendasDinheiro']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasDinheiro'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Débito</th>
+        <th>{{$dados['qtdVendasDebito']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasDebito'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Crédito</th>
+        <th>{{$dados['qtdVendasCredito']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasCredito'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Múltiplo</th>
+        <th>{{$dados['qtdVendasMultiplo']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasMultiplo'], 2, ',', '.')}}</th>
+    </tr>
+    <tr>
+        <th>Depósito / Transferência</th>
+        <th>{{$dados['qtdVendasDeposito']}}</th>
+        <th>R$ {{number_format($dados['vlrVendasDeposito'], 2, ',', '.')}}</th>
+    </tr>
+    </tbody>
+</table>
+
+<h4 align="center">Listagem de Vendas</h4>
+
+<table class="table table-condensed">
+    <thead>
+    <tr>
         <th width="10%">ID</th>
-        <th width="25%">Status</th>
+        <th width="15%">Status</th>
         <th width="25%">Forma de Pagamento</th>
-        <th width="20%">Valor Total</th>
+        <th width="15%">Valor Total</th>
         <th width="20%">Data</th>
+        <th width="15%">Vendedor</th>
     </tr>
     </thead>
     <tbody>
@@ -29,13 +102,16 @@
             <td>{{$venda->getFormaDePagamento()}}</td>
             <td>R$ {{number_format($venda->absolut_total, 2, ',', '.')}}</td>
             <td>{{$venda->getDataFormatada()}}</td>
+            <td>{{\App\User::find($venda->user_id) == null ? "" : \App\User::find($venda->user_id)->name}}</td>
         </tr>
     @endforeach
     </tbody>
 </table>
 </body>
 <style>
-    @import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);@charset "UTF-8";
+    @import url(https://fonts.googleapis.com/css?family=Raleway:300,400,600);
+
+    @charset "UTF-8";
 
     /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
@@ -355,7 +431,6 @@
         }
     }
 
-
     *:before,
     *:after {
         -webkit-box-sizing: border-box;
@@ -408,14 +483,12 @@
         vertical-align: middle;
     }
 
-
     hr {
         margin-top: 22px;
         margin-bottom: 22px;
         border: 0;
         border-top: 1px solid #eeeeee;
     }
-
 
     [role="button"] {
         cursor: pointer;
@@ -571,8 +644,6 @@
     }
 
     mark,
-
-
     ul,
     ol {
         margin-top: 0;
@@ -585,7 +656,6 @@
     ol ol {
         margin-bottom: 0;
     }
-
 
     .list-inline > li {
         display: inline-block;
@@ -3384,7 +3454,7 @@
         text-decoration: none;
         background-color: transparent;
         background-image: none;
-        filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+        filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
         cursor: not-allowed;
     }
 
@@ -6853,7 +6923,6 @@
     @-ms-viewport {
         width: device-width;
     }
-
 
     @media (min-width: 992px) and (max-width: 1199px) {
         .visible-md-inline {

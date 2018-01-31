@@ -25,12 +25,13 @@ class ReportController extends Controller
 
         $dataFinalFormatada = new \DateTime($request->get('dateFinal'));
         $dataInicialFormatada = new \DateTime($request->get('dateInicial'));
-    	$dados['dataInicial'] = $dataFinalFormatada->format('d-m-Y');
-    	$dados['dataFinal'] = $dataInicialFormatada->format('d-m-Y');
+    	$dados['dataInicial'] = $dataInicialFormatada->format('d/m/Y');
+    	$dados['dataFinal'] = $dataFinalFormatada->format('d/m/Y');
 
     	$orderDao = new App\Dao\DaoOrder();
     	$dados['qtdVendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 0)->count();
     	$dados['vlrVendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 0)->sum('absolut_total');
+    	$dados['avgVendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 0)->avg('absolut_total');
     	$dados['qtdVendasConcluidas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 3)->count();
     	$dados['vlrVendasConcluidas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 3)->sum('absolut_total');
     	$dados['qtdVendasCanceladas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 1)->count();
@@ -47,7 +48,16 @@ class ReportController extends Controller
     	$dados['vlrVendasMultiplo'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 4, $final)->sum('absolut_total');
     	$dados['qtdVendasDeposito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 5, $final)->count();
     	$dados['vlrVendasDeposito'] = $orderDao->buscaVendasPorFormaDePagamento($request->get('dateInicial'), 5, $final)->sum('absolut_total');
-    	dd($dados);
+        $dados['vendas'] = $orderDao->buscaTotalDeVendas($request->get('dateInicial'), $final, 0)->sortBy('status');
+
+        if ( $dados['qtdVendas'] >= 0 ) {
+//            return view('admin.reports.sells', compact( 'dados' ));
+            $pdf = PDF::loadView( 'admin.reports.sells', compact( 'dados' ) );
+            return $pdf->download( 'Relatorio_Vendas_Periodico.pdf' );
+        } else {
+            $request->session()->flash('message', 'Não existem vendas no período informado!');
+            return redirect()->route('report');
+        }
     }
 
     public function generateUserReport(Request $request){
@@ -182,7 +192,7 @@ class ReportController extends Controller
     {
         $dados = [];
         $dataFormatada = new \DateTime($date);
-        $dados['data'] = $dataFormatada->format('d-m-Y');
+        $dados['data'] = $dataFormatada->format('d/m/Y');
 
         /*SELECT P.ID, P.name, SUM(M.qtd) AS QTD, M.vlrUnit, (M.vlrUnit * SUM(M.qtd)) AS total FROM moves M
         JOIN products P ON M.product_id = P.ID WHERE M.STATUS = 2
