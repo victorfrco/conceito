@@ -55,7 +55,8 @@
             else{
                 $arrayLinks = [
                         ['link' => route('admin.clients.index'), 'title' => 'Clientes'],
-                        ['link' => route('admin.cashes.index'), 'title' => 'Meu Caixa']
+                        ['link' => route('admin.cashes.index'), 'title' => 'Meu Caixa'],
+                        ['link' => route('report'), 'title' => 'Relatórios']
                     ];
             }
              $arrayLinksRight = [
