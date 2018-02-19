@@ -22,6 +22,7 @@ Route::post('/admin/generateReport', 'ReportController@generateReport');
 Route::post('/admin/analiticReport', 'ReportController@generateAnaliticReport');
 Route::post('/admin/sellReport', 'ReportController@generateSellReport');
 Route::post('/admin/userReport', 'ReportController@generateUserReport');
+Route::post('/admin/singleUserReport', 'ReportController@generateSingleUserReport');
 Route::get('/admin/report', 'ReportController@index')->name('report');
 Route::post('/admin/addStock', 'ProductController@addStock');
 Route::get('/admin/stock', 'ProductController@stock')->name('estoque');
