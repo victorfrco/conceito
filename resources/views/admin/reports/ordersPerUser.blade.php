@@ -8,14 +8,16 @@
 
 <p><span style="font-weight: bold">Quantidade de Vendas :</span> {{$dados['qtdVendas']}}</p>
 <p><span style="font-weight: bold">Valor total de vendas :</span>R$ {{number_format($dados['vlrVendas'], 2, ',', '.')}}</p>
+<p><span style="font-weight: bold">Valor total descontado :</span>R$ {{number_format($dados['discount'], 2, ',', '.')}}</p>
 <p><span style="font-weight: bold">Valor médio de vendas :</span>R$ {{number_format($dados['avgVendas'], 2, ',', '.')}}</p>
 <table class="table table-striped">
     <thead>
     <tr>
         <th width="10%">ID</th>
-        <th width="25%">Status</th>
+        <th width="15%">Status</th>
         <th width="25%">Forma de Pagamento</th>
-        <th width="20%">Valor Total</th>
+        <th width="15%">Valor Total</th>
+        <th width="15%">Desconto</th>
         <th width="20%">Data</th>
     </tr>
     </thead>
@@ -28,6 +30,7 @@
             <th>{{$venda->getStatusFormatado()}}</th>
             <td>{{$venda->getFormaDePagamento()}}</td>
             <td>R$ {{number_format($venda->absolut_total, 2, ',', '.')}}</td>
+            <td>R$ {{number_format($venda->discount, 2, ',', '.')}}</td>
             <td>{{$venda->getDataFormatada()}}</td>
         </tr>
     @endforeach

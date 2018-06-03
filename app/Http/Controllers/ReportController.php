@@ -74,6 +74,7 @@ class ReportController extends Controller
         $orderDao = new App\Dao\DaoOrder();
         $dados['qtdVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->count();
         $dados['vlrVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sum('absolut_total');
+        $dados['discount'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sum('discount');
         $dados['avgVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->avg('absolut_total');
         $dados['vendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sortBy('status');
 
