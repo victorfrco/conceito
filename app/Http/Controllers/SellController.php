@@ -326,14 +326,14 @@ class SellController extends Controller
                 $discount = Sell::converteMoedaParaDecimal($request->toArray()['valorDesconto']);
                 $order->total -= $discount;
                 $order->discount = $discount;
-                $cashMovesDiscount = new CashMoves();
-                $cashMovesDiscount->type = $cashMoves->getTIPODESCONTO();
-                $cashMovesDiscount->cash_id = $cash->id;
-                $cashMovesDiscount->order_id = $order->id;
-                $cashMovesDiscount->user_id = Auth::id();
-                $cashMovesDiscount->total = $discount;
-                $cashMovesDiscount->obs = 'Desconto aplicado na venda '.$order->id;
-                $cashMovesDiscount->save();
+//                $cashMovesDiscount = new CashMoves();
+//                $cashMovesDiscount->type = $cashMoves->getTIPODESCONTO();
+//                $cashMovesDiscount->cash_id = $cash->id;
+//                $cashMovesDiscount->order_id = $order->id;
+//                $cashMovesDiscount->user_id = Auth::id();
+//                $cashMovesDiscount->total = $discount;
+//                $cashMovesDiscount->obs = 'Desconto aplicado na venda '.$order->id;
+//                $cashMovesDiscount->save();
             }
 	    }
 

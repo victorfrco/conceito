@@ -1,31 +1,59 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <div class="row">
-            <h2>Informações da Empresa</h2>
+    @if($company != null)
+        <div class="container">
+            <div class="row">
+                <h2>Informações da Empresa</h2>
+            </div>
+            <form class="form" action="{{route('dadosEmpresa')}}" method="POST">
+                Nome Fantasia:
+                <input type="text" name="name" value="{{$company->name}}">
+                <br>
+                CNPJ:
+                <input maxlength="18" minlength="18" type="text" name="cnpj" id="cnpj" value="{{$company->cnpj}}">
+                <br>
+                Endereço:
+                <input type="text" name="address" value="{{$company->address}}">
+                <br>
+                Telefone:
+                <input maxlength="14" minlength="13" type="text" name="phone" id="phone" value="{{$company->phone}}">
+                <br>
+                Mensagem:
+                <input type="text" name="msg" width="500" value="{{$company->msg}}">
+                <br>
+                <br>
+                <button class=" btn btn-success" type="submit">Atualizar</button>
+            </form>
+            <br>
         </div>
-        <form class="form" action="{{route('dadosEmpresa')}}" method="POST">
-            Nome Fantasia:
-            <input type="text" name="name" value="{{$company->name}}">
+        @else()
+        <div class="container">
+            <div class="row">
+                <h2>Informações da Empresa</h2>
+            </div>
+            <form class="form" action="{{route('dadosEmpresa')}}" method="POST">
+                Nome Fantasia:
+                <input type="text" name="name" value="">
+                <br>
+                CNPJ:
+                <input maxlength="18" minlength="18" type="text" name="cnpj" id="cnpj" value="">
+                <br>
+                Endereço:
+                <input type="text" name="address" value="">
+                <br>
+                Telefone:
+                <input maxlength="14" minlength="13" type="text" name="phone" id="phone" value="">
+                <br>
+                Mensagem:
+                <input type="text" name="msg" width="500" value="">
+                <br>
+                <br>
+                <button class=" btn btn-success" type="submit">Inserir</button>
+            </form>
             <br>
-            CNPJ:
-            <input maxlength="18" minlength="18" type="text" name="cnpj" id="cnpj" value="{{$company->cnpj}}">
-            <br>
-            Endereço:
-            <input type="text" name="address" value="{{$company->address}}">
-            <br>
-            Telefone:
-            <input maxlength="14" minlength="13" type="text" name="phone" id="phone" value="{{$company->phone}}">
-            <br>
-            Mensagem:
-            <input type="text" name="msg" width="500" value="{{$company->msg}}">
-            <br>
-            <br>
-            <button class=" btn btn-success" type="submit">Atualizar</button>
-        </form>
-        <br>
-    </div>
+        </div>
+        @endif
     <script>
         $('#cnpj').keyup(function(){
             var v = $(this).val();
