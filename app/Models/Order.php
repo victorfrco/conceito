@@ -141,10 +141,7 @@ class Order extends Model implements TableInterface
             case 4:
                 $pagamentoFormatado = 'Variado';
                 break;
-			case 5:
-				$pagamentoFormatado = 'Transferência/Depósito';
-				break;
-            case 6:
+            case 5:
                 $pagamentoFormatado = 'Parcial';
                 break;
 		}
@@ -226,9 +223,6 @@ class Order extends Model implements TableInterface
             case 4:
                 $pagamentoFormatado = 'Múltiplo';
                 break;
-			case 5:
-				$pagamentoFormatado = 'Transferência/Depósito';
-				break;
 		}
 		return $pagamentoFormatado;
 	}

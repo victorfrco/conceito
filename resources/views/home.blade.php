@@ -27,6 +27,8 @@
             <strong>Ok!</strong> Venda realizada com sucesso!
         </div>
     @endif
+
+
     <div class="container">
         <div class="col-xs-7 col-sm-6 col-lg-7"  style="margin-left:-90px; margin-right: 130px; margin-bottom: 10px;">
             @if(App\Http\Controllers\CashController::buscaCaixaPorUsuario(\Illuminate\Support\Facades\Auth::id()) != null)
@@ -38,9 +40,10 @@
         </div>
         <div class="row" style="text-align: right">
             {!! Form::open(array('action' => 'SellController@codBarra', 'method' => 'post', 'style' => 'display:inline')) !!}
-            {!! Form::search('product_barcode',null,['placeholder' => 'Código do produto...', 'class' => 'btn', 'style' => 'text-align:left; width:300px; color: #ffffff; background-color:#000000; border-color:#edb820', 'id' => 'codBar']) !!}
+            {{Form::text('qtd',null,['placeholder' => 'Qtd', 'class' => 'btn', 'style' => 'text-align:left; width:50px; color: #ffffff; background-color:#000000; border-color:#ffcc00', 'id' => 'codBarQtd'])}}
+            {!! Form::search('product_barcode',null,['placeholder' => 'Código do produto...', 'class' => 'btn', 'style' => 'text-align:left; width:200px; color: #ffffff; background-color:#000000; border-color:#ffcc00', 'id' => 'codBar']) !!}
             @if(isset($order))
-                {!! Form::button(Icon::barcode(), ['type'=>'submit', 'class' => 'btn btn-primary']) !!}
+                {!! Form::button(Icon::barcode(), ['type'=>'submit', 'class' => 'btn btn-primary', 'rel'=>'tooltip', 'title'=>'Buscar produto por código']) !!}
             @else
                 {!! Form::button(Icon::barcode(), ['type'=>'submit', 'class' => 'btn btn-primary', 'disabled' => 'true']) !!}
             @endif
@@ -49,26 +52,34 @@
                    {!! Form::hidden('order_id', $order->id) !!}
             @endisset
             {!! Form::close() !!}
-            @if(isset($order) && !$order->associated)
-                {!! Button::success(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#confirmarAssociadoModal'])  !!}
-            @elseif(isset($order) && $order->associated)
-                {!! Button::danger(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerAssociadoModal'])  !!}
+            @if(isset($order))
+                @if(!$order->associated)
+                    @if($order->pay_method != '3')
+                        {!! Button::success(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#confirmarAssociadoModal', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
+                        {!! Button::success(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#confirmarCartaoModal', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
+                    @elseif($order->pay_method == '3')
+                        {!! Button::primary(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
+                        {!! Button::danger(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerCartaoModal', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
+                    @endif
+                @elseif($order->associated)
+                    {!! Button::danger(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerAssociadoModal', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
+                    {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
+                @endif
+                    {!! Form::open(array('action' => 'SellController@imprimirCupom', 'method' => 'post', 'style' => 'display:inline', 'target'=>'_blank')) !!}
+                    {!! Form::hidden('order_id',$order->id) !!}
+                    {!! Form::button(Icon::create('list-alt'), ['type' => 'submit', 'class' => 'btn btn-primary btn-sm', 'style' => 'width:40px;display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'rel'=>'tooltip', 'title'=>'Imprimir cupom da venda'] )  !!}
+                    {!! Form::close() !!}
             @else
-                {!! Button::primary(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true'])  !!}
-            @endif
-            @if(isset($order) && $order->pay_method != '3')
-                {!! Button::success(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#confirmarCartaoModal'])  !!}
-            @elseif(isset($order) && $order->pay_method == '3')
-                {!! Button::danger(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'data-toggle' => 'modal', 'data-target' => '#removerCartaoModal'])  !!}
-            @else
-                {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true'])  !!}
+                {!! Button::primary(Icon::create('link'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar desconto conforme tabela'])  !!}
+                {!! Button::primary(Icon::create('credit-card'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Aplicar taxa do cartão conforme tabela'])  !!}
+                {!! Button::primary(Icon::create('list-alt'))->addAttributes(['style' => 'display: inline;margin-left:30px; margin-right:-35px; height:40px;', 'disabled' => 'true', 'rel'=>'tooltip', 'title'=>'Imprimir cupom da venda'])  !!}
             @endif
         </div>
         <div class="row">
-            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); overflow: auto; margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
+            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#000000; background-image:url({{asset('storage/images/brands/listaEsquerda.jpg')}});  margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
                 @php
                     foreach($categories as $category){
-                        $brands = App\Models\Brand::all()->where('category_id', '=', $category->id);
+                        $brands = App\Models\Brand::all()->where('category_id', '=', $category->id)->where('status','=', 1);
                         $listadivs = [];
                         foreach ($brands as $brand){
                             $exibe = App\Models\Brand::criaLista($brand->id);
@@ -79,25 +90,32 @@
                         $string = implode($listadivs);
 
                        $names[] = [
-                                'title' => $category->name,
-                                'content' => "<div>$string</div>"
+                                'title' => '<p style="text-align:center; font-size:12px" rel="tooltip" title="'.$category->name.' : '.$category->description.'" >'.substr($category->name,0,9).'</p>',
+                                'content' => '<div class="chico" style="overflow-y: scroll">'.$string.'</div>'
                             ];
                             unset($listadivs);
                      }
                       $names[] = [
-                         'title' => Icon::create('plus'),
+                         'title' => '<p style="text-align:center; vertical-align: top; font-size:20px" rel="tooltip" title="Nova Categoria">'.Icon::create('plus').'</p>',
                          'content' => ''
                      ];
                 @endphp
                 @if(isset($order))
                     {!! Tabbable::withContents($names) !!}
                 @else
-                    <h4>Para iniciar uma venda clique em "Nova Mesa"!</h4>
+                    <h4 style="text-align: center; margin-top: 25%">Para iniciar clique em "Nova Venda" ou selecione uma mesa disponível!</h4>
                 @endif
             </div>
-            <div class="col-xs-5 col-sm-6 col-lg-5" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); margin-right:-40px; border: solid; border-width: 1px; height: 450px; overflow: auto">
+            <div class="col-xs-5 col-sm-6 col-lg-5" style="background-color:#000000; background-image:url({{asset('storage/images/brands/listaEsquerda.jpg')}}); margin-right:-40px; border: solid; border-width: 1px; height: 450px; overflow: auto">
                 @if(isset($order))
-                        <div align="center" style="border-bottom: solid; border-width: 1px; border-color: #2F3133"> Produtos de {{$order->client->name}}</div>
+                        <div align="center" style="border-bottom: solid; border-width: 1px; border-color: #2F3133"> Produtos de
+                            @php
+                            if($order->type == 2)
+                                echo \App\Desk::all()->where('order_id','=', $order->id)->where('status','=',1)->first()->name.' ('.$order->id.')';
+                            else
+                                echo $order->client->name.'('.$order->id.')';
+                            @endphp
+                        </div>
                         {!! $tabela = App\Models\Sell::atualizaTabelaDeItens($order->id)!!}
                 @else
                         <div align="center" style="border-bottom: solid; border-width: 1px; border-color: #2F3133"> Lista de Produtos </div>
@@ -105,8 +123,8 @@
 
             </div>
         </div>
-        <div style="margin-left:-70px">Mesas:</div>
-        <div class="col-xs-7 col-sm-6 col-lg-7" style="max-height: 70px; min-width:770px; margin-left:-80px; overflow-x: auto;white-space: nowrap;">
+            <div style="margin-left:-75px">Vendas:</div>
+        <div class="col-xs-7 col-sm-6 col-lg-7" style="max-height: 70px; min-width:770px; margin-left:-90px; overflow-x: auto;white-space: nowrap;">
             @php
                 if(App\Http\Controllers\CashController::buscaCaixaPorUsuario(\Illuminate\Support\Facades\Auth::id()) != null){
                     $orderController = new App\Http\Controllers\OrderController();
@@ -115,7 +133,16 @@
             @endphp
         </div>
         <div class="col-xs-5 col-sm-6 col-lg-5" style="margin-top:-20px; margin-right: -60px; text-align:left;  display: inline;">
-            <p style="margin-left: 10px; margin-top: -5px">Valor total da compra: <span style="font-size: 22px;  display: inline;">R$@if(isset($order)){{number_format($order->total, 2, ',', '.')}} @else 0,00 @endif </span>
+                {{--@php--}}
+                    {{--if(isset($order))--}}
+                        {{--if(\App\Http\Controllers\OrderController::possuiPagamento($order))--}}
+                            {{--echo '<p style="margin-left: 27px; margin-top: -5px">Valor a pagar: <span style="font-size: 22px; text-shadow: 1px 1px #ffcc00; color: #ffffff; display: inline;">R$'.number_format($order->total, 2, ',', '.').' (valor pago R$'.(\App\Http\Controllers\OrderController::valorPago($order)).')</span>';--}}
+                        {{--else--}}
+                            {{--echo '<p style="margin-left: 27px; margin-top: -5px">Valor a pagar: <span style="font-size: 22px; text-shadow: 1px 1px #ffcc00; color: #ffffff; display: inline;">R$'.number_format($order->total, 2, ',', '.').'</span>';--}}
+                    {{--else--}}
+                        {{--echo '<p style="margin-left: 27px; margin-top: -5px">Valor a pagar: <span style="font-size: 22px; text-shadow: 1px 1px #ffcc00; color: #ffffff; display: inline;">R$0,00</span>';--}}
+                    {{--@endphp--}}
+            <p style="margin-left: 27px; margin-top: -5px">Valor a pagar: <span style="font-size: 22px; text-shadow: 1px 1px #ffcc00; color: #ffffff; display: inline;">R$@if(isset($order)){{number_format($order->total, 2, ',', '.')}} @else 0,00 @endif </span>
                 @php
                     if(isset($order))
                         if(\App\Http\Controllers\OrderController::possuiPagamento($order))
@@ -147,349 +174,138 @@
                 }
             @endphp
         </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="productModal" tabindex="-1" >
-        <div class="modal-dialog" style="width: 800px">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title titulo" id="titulo"></h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@addProducts', 'method' => 'post')) !!}
-                <div class="modal-body task" id="task" >
-                </div>
-                <div class="modal-footer">
-                    @php
-                        if(isset($order))
-                            echo Form::hidden('order_id', $order->id);
-                    @endphp
-                    {!! Form::submit('Adicionar à venda!', array('class' => 'btn btn-success')) !!}
-                    {!! Form::close() !!}
-                </div>
-            </div>
+        @if(\App\Desk::all()->where('status', '=', 1)->where('user_id','=',Auth::id())->isNotEmpty())
+            <div style="margin-left:-75px">Mesas:</div>
+        @endif
+        <div class="col-xs-7 col-sm-6 col-lg-7" style="max-height: 70px; min-width:1280px; margin-left:-90px;overflow-x: auto;white-space: nowrap;">
+            @php
+                if(App\Http\Controllers\CashController::buscaCaixaPorUsuario(\Illuminate\Support\Facades\Auth::id()) != null){
+                    echo '<a href="'.action("DeskController@createDesk").'">'.\Bootstrapper\Facades\Button::success('+')->addAttributes(['style' => 'height:39px ;width:50px;margin-right:9px']).'</a>';
+                    $deskController = new App\Http\Controllers\DeskController();
+                    echo $deskController->carregaMesas();
+                }
+            @endphp
         </div>
     </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="novaMesaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title titulo" id="titulo">Nova Mesa</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@criarMesa', 'method' => 'post')) !!}
 
-                <div class="modal-body task" id="task" >
-                    <div class="form-group">
-                        {!! Form::Label('cliente', 'Selecione um Cliente:') !!}
-                        <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="client_id">
-                            {!! $clientes = App\Models\Client::all() !!}
-                            @foreach($clientes as $client)
-                                <option value="{{$client->id}}">{{$client->nickname}}</option>
-                            @endforeach
-                        </select>
-                        <br>
-                        {{--<p style="display:inline; vertical-align: middle;font-weight: bold">É cliente associado? </p>--}}
-                        {!! Form::hidden('associated', 0) !!}
-                        {{--{!! Form::checkbox('associated', 1, '',array('class'=>'checkbox-inline','style' => 'margin-top: -1px;width: 20px; height: 20px;')) !!}--}}
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    @php
-                    if(isset($order))
-                        echo Form::hidden('order_id', $order->id);
-                    @endphp
-
-                    {!! Form::submit('Criar Mesa!', array('class' => 'btn btn-success')) !!}
-                    {!! Form::close() !!}
-                    {!! Button::primary('Novo Cliente')->asLinkTo(route('admin.clients.create')) !!}
-                </div>
-            </div>
-        </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="vendaParcial" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" style="width: 800px" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Venda Parcial</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@vendaParcial', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    @php
-                    if(isset($order))
-                        if(\App\Http\Controllers\OrderController::possuiPagamento($order)){
-                        echo '<br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p>
-                    <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">';
-                        $users = App\User::all();
-                        foreach($users as $user)
-                            echo '<option value="'.$user->id.'">'.$user->name.'</option>';
-
-                    echo '</select><br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o valor a ser pago: </p>
-                    <select class="" id="formaPagamentoParcial" name="formaPagamento" style="width: 212px;" disabled="true">
-                        <option value="4">Múltiplo</option>
-                    </select>
-                    <div id="obsParcial" style="display: block; width:500px">';
-                        if(isset($order))
-                            echo 'Valor total pago: <input id="valorPago" name="valorPago" type="number" max="'.$order->total.'" step="0.01">
-                            <br>
-                        Informe uma observação:
-                        <textarea name="obsParcial" style="width:500px"></textarea>
-                    </div>
-                    <div id="produtosParciais">';
-                    if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                            echo Form::hidden('formaPagamento', 4);
-                        }else
-                            echo 'Não existe pedido em aberto!';
-                       }
-                        else{
-                        echo '<br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p>
-                    <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">';
-                        $users = App\User::all();
-                        foreach($users as $user)
-                            echo '<option value="'.$user->id.'">'.$user->name.'</option>';
-                        echo '</select>';
-                        echo '<br><p style="display:inline; vertical-align: middle;font-weight: bold">Selecione a forma de pagamento: </p>
-                    <select class="" id="formaPagamentoParcial" required name="formaPagamento" style="width: 212px;" onclick="parcial()">
-                        <option value="">Selecione...</option>
-                        <option value="1">Dinheiro</option>
-                        <option value="2">Cartão de Débito</option>
-                        <option value="3">Cartão de Crédito</option>
-                        <option value="4">Múltiplo</option>
-                        <option value="5">Transferência/Depósito</option>
-                    </select>
-                    <div id="obsParcial" style="display: none; width:500px">';
-                        if(isset($order))
-                            echo 'Valor total pago: <input id="valorPago" name="valorPago" type="number" max="'.$order->total.'" step="0.01">
-                            <br>
-                        Informe uma observação:
-                        <textarea name="obsParcial" style="width:500px"></textarea>
-                    </div>
-                    <div id="produtosParciais">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold">Selecione os produtos a pagar: </p>';
-                    if(isset($order)){
-                            $products = App\Http\Controllers\SellController::buscaProdutosPorVenda($order);
-                            echo $products;
-                            echo Form::hidden('order_id', $order->id);
-                        }else
-                        echo 'Não existe pedido em aberto!';
-                        }
-                    @endphp
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Concluir!', array('class' => 'btn btn-success')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                </div>
-            </div>
-        </div></div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="concluirVendaModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    {{--vincularVendaMesa--}}
+    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="vincularVendaMesa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Finalizar Venda</h4>
+                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">Nova Mesa</h4>
                 </div>
-                {!! Form::open(array('action' => 'SellController@concluirVenda', 'method' => 'post')) !!}
+                {!! Form::open(array('action' => 'DeskController@vincularMesa', 'method' => 'post')) !!}
                 <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p>
-                    <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">
-                        {!! $users = App\User::all() !!}
-                        @foreach($users as $user)
-                            <option value="{{$user->id}}">{{$user->name}}</option>
+                    {!! Form::Label('venda', 'Selecione uma Venda:') !!}
+                    <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="order_id">
+                        {!! $vendas = App\Models\Order::all()->whereIn('status', [4,5])->where('type', '=', 1) !!}
+                        @foreach($vendas as $venda)
+                            <option value="{{$venda->id}}">{{$venda->client->nickname}}</option>
                         @endforeach
                     </select>
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold">Selecione a forma de pagamento: </p>
-                    <select class="" id="formaPagamentoTotal" required name="formaPagamento" style="width: 212px;" onclick='troco();total();'>
-                        <option value="">Selecione...</option>
-                        <option value="1">Dinheiro</option>
-                        <option value="2">Cartão de Débito</option>
-                        <option value="3">Cartão de Crédito</option>
-                        <option value="4">Múltiplo</option>
-                        <option value="5">Transferência/Depósito</option>
-                    </select>
-                    <div id="troco" style="display: none;">
-                        @if(isset($order))
-                            Valor da venda (R$): <input style="margin-left: 5px; width: 90px" type="text" id="num1" value="{{$order->total}}" disabled="true" />
-                             |
-                        @endif
-                        Valor entregue: <input style="margin-left: 5px; width: 90px" type="text" id="num2" onblur="calcular();" />
-                        <br>
-                    </div>
-                    <div id="obsTotal" style="display: none; width:500px">
-                        @if(isset($order))
-                        Valor total pago: <input id="valorPago" name="valorPago" type="number" value="{{$order->total}}" disabled="true" step="0.01">
-                        <br>
-                        @endif
-                        Informe uma observação:
-                        <textarea name="obs" style="width:500px"></textarea>
-                    </div>
-                    <div id="valorDesconto" style="display: none;">
-                        Desconto(R$) <input style="width: 90px"; id="num3" name="valorDesconto" type="text" step="0.01" onblur="calcular();">
-                    </div>
-                    <span id="resultado" style="font-size: 22px; font-weight: bold"></span>
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                        }
-                    @endphp
+                    <input type="hidden" name="desk_id" />
+                    {!! Form::token() !!}
                 </div>
                 <div class="modal-footer">
-                    <p style="display: inline; margin-right: 70px">Clique <a onclick='mostraDesconto()'>AQUI</a> para aplicar desconto!</p>
-                    {!! Form::submit('Concluir!', array('class' => 'btn btn-success')) !!}
+                    @if(sizeof($vendas) > 0)
+                    {!! Form::submit('Vincular!', array('class' => 'btn btn-success')) !!}
+                    @else
+                    {!! Form::submit('Vincular!', array('class' => 'btn btn-success', 'disabled'=>'true')) !!}
+                    @endif
+                    {!! Form::close() !!}
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+
+                    {!! Form::open(array('action' => 'DeskController@criarMesaVenda', 'method' => 'post')) !!}
+                    <input type="hidden" name="desk_id" />
+                    {!! Form::token() !!}
+                    {!! Form::submit('Nova Venda!', array('class' => 'btn btn-primary mr-auto','style' => 'float: left;margin-top:-35px')) !!}
+                    {!! Form::close() !!}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="excluirMesa" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">Excluir Mesa</h4>
+                </div>
+                {!! Form::open(array('action' => 'DeskController@excluirMesa', 'method' => 'post')) !!}
+                <div class="modal-body">
+                    <p style="text-align: center; font-weight: bold">Deseja realmente excluir essa mesa?</p>
+                    <input type="hidden" name="desk_id" />
+                    {!! Form::token() !!}
+                </div>
+                <div class="modal-footer">
+                    {!! Form::submit('Excluir!', array('class' => 'btn btn-danger')) !!}
                     {!! Form::close() !!}
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 </div>
             </div>
         </div>
     </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="cancelarVendaModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Cancelar</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@cancelarVenda', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold">  Deseja realmente cancelar a venda? </p>
 
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                        }
-                    @endphp
-                    {!! Form::token() !!}
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Sim!', array('class' => 'btn btn-danger')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="confirmarAssociadoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Aplicar Desconto</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@aplicarRemoverDesconto', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja aplicar desconto de atacado para esta venda? </p>
+    @include('modal/confirmarAssociadoModal')
+    @include('modal/removerAssociadoModal')
+    @include('modal/confirmarCartaoModal')
+    @include('modal/removerCartaoModal')
+    @include('modal/productModal')
+    @include('modal/novaMesaModal')
+    @include('modal/concluirVendaModal')
+    @include('modal/cancelarVendaModal')
+    @include('modal/vendaParcial')
 
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                        }
-                    @endphp
-                    {!! Form::token() !!}
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Sim!', array('class' => 'btn btn-success')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="removerAssociadoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Remover Desconto</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@aplicarRemoverDesconto', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja remover o desconto de atacado para esta venda? </p>
-
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                        }
-                    @endphp
-                    {!! Form::token() !!}
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Sim!', array('class' => 'btn btn-danger')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="confirmarCartaoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Aplicar Taxa</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@aplicarRemoverCartao', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja aplicar taxa de cartão de crédito para esta venda? </p>
-
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                            echo Form::hidden('aplica', 1);
-                        }
-                    @endphp
-                    {!! Form::token() !!}
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Sim!', array('class' => 'btn btn-success')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div data-keyboard="false" data-backdrop="static" class="modal fade" id="removerCartaoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel" style="color: #2F3133">{!!\Bootstrapper\Facades\Icon::create('warning-sign')->withAttributes(['class' => 'btn-lg'])!!}&ensp;&ensp;  Remover Taxa</h4>
-                </div>
-                {!! Form::open(array('action' => 'SellController@aplicarRemoverCartao', 'method' => 'post')) !!}
-                <div class="modal-body">
-                    <br><p style="display:inline; vertical-align: middle;font-weight: bold; color: #2F3133">  Deseja remover a taxa de cartão de crédito para esta venda? </p>
-
-                    @php
-                        if(isset($order)){
-                            echo Form::hidden('order_id', $order->id);
-                            echo Form::hidden('aplica', 0);
-                        }
-                    @endphp
-                    {!! Form::token() !!}
-                </div>
-                <div class="modal-footer">
-                    {!! Form::submit('Sim!', array('class' => 'btn btn-danger')) !!}
-                    {!! Form::close() !!}
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Não</button>
-                </div>
-            </div>
-        </div>
-    </div>
     <meta name="_token" content="{!! csrf_token() !!}" />
     <script src="{{asset('js/ajax-crud.js')}}"></script>
 @endsection
 @section('scripts')
     <script>
         setTimeout(function() {
-            document.getElementById( "codBar" ).focus();
+            document.getElementById( "codBarQtd" ).focus();
         }, 0 );
+
+        $(document).ready(function(){
+            var y = document.getElementById("tabsCategorias").style.height;
+            var z = y.replace(/\D/g,'');
+            var tabCount = $('#tabsCategorias > ul> li').length;
+            if(tabCount > 0 && tabCount < 8) {
+                z = z - 45  ;
+                $(".chico").css({"height": z + "px"}) ;
+            }
+            if(tabCount > 7 && tabCount < 15) {
+                z = z - 90  ;
+                $(".chico").css({"height": z + "px"}) ;
+            }
+            if(tabCount > 14 && tabCount < 22) {
+                z = z - 135  ;
+                $(".chico").css({"height": z + "px"}) ;
+            }
+            if(tabCount > 21 && tabCount < 29) {
+                z = z - 180  ;
+                $(".chico").css({"height": z + "px"}) ;
+            }
+        });
+
         function incrementaProduto($id) {
             document.getElementById($id).stepUp(1);
         }
+
         function decrementaProduto($id) {
             document.getElementById($id).stepDown(1);
         }
+
+        function incrementavenda($id) {
+            document.getElementById($id).stepUp(1);
+        }
+
+        function decrementavenda($id) {
+            document.getElementById($id).stepDown(1);
+        }
+
         $('#tabsCategorias > ul> li:last').click(function (e) {
             e.preventDefault();
             window.location = $('#tabsCategorias').attr('data-url');
@@ -522,23 +338,73 @@
         }
 
         function calcular() {
-            var num1 = Number(document.getElementById("num1").value);
-            var num2 = Number(document.getElementById("num2").value);
-            var num3 = Number(document.getElementById("num3").value);
-            var elemResult = document.getElementById("resultado");
-            var sub = num2 - num1 + num3;
+            var num1 = document.getElementById("num1T").value;
+            var num2 = document.getElementById("num2").value;
+            var num3 = document.getElementById("num3").value;
 
-            if (elemResult.textContent === undefined) {
-                elemResult.textContent = "Troco (R$): " + sub.toFixed(2) + "";
-            }
-            else { // IE
-                elemResult.innerText = "Troco (R$): " + sub.toFixed(2) + "";
-            }
+            if (num2 !== null && num2 !== '')
+            {
+                num2=num2.replace(/\D/g,'');
+                if(num2 > 0)
+                    num2 = num2/100;
+            }else
+                num2 = 0;
+
+            if (num1 !== null && num1 !== '')
+            {
+                num1=num1.replace(/\D/g,'');
+                if(num1 > 0)
+                    num1 = num1/100;
+            }else
+                num1 = 0;
+
+            if (num3 !== null && num3 !== '')
+            {
+                num3=num3.replace(/\D/g,'');
+                if(num3 > 0)
+                    num3 = num3/100;
+            }else
+                num3 = 0;
+
+            var sub = num2 - (num1 - num3);
+            sub=sub.toFixed(2);
+            sub=sub.toString();
+            sub=sub.replace(/\D/g,'');
+            sub=sub.replace(/(\d{1,2})$/, ',$1');
+            sub=sub.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+            sub = sub != ''?'R$ '+sub:'';
+            sub=sub.replace(/^0+/, '');
+
+            if(num2 < (num1 - num3))
+                document.getElementById('resultadoT').value = "-"+sub;
+            else
+                document.getElementById('resultadoT').value = sub;
         }
         function mostraDesconto(){
             document.getElementById('valorDesconto').style.display = 'block';
         }
 
+        $(document).ready(function(){
+            $("[rel=tooltip]").tooltip({ placement: 'bottom'});
+        });
+
+        $(document).ready(function() {
+            $('button.darken-2').click(function(event) {
+                var sDeskId = $(this).attr('data_desk_id');
+                var oModalEdit = $('#vincularVendaMesa');
+                oModalEdit.find('input[name="desk_id"]').val(sDeskId);
+            });
+
+        });
+
+        $(document).ready(function() {
+            $('button.darken-2').click(function(event) {
+                var sDeskId = $(this).attr('data_desk_id');
+                var oModalEdit = $('#excluirMesa');
+                oModalEdit.find('input[name="desk_id"]').val(sDeskId);
+            });
+
+        });
     </script>
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">

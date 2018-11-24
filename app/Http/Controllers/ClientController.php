@@ -83,7 +83,6 @@ class ClientController extends Controller
             'method' => 'PUT',
             'model' => $client
         ]);
-
         return view('admin.clients.edit', compact('form'));
     }
 
@@ -108,7 +107,6 @@ class ClientController extends Controller
         }
 
         $data = $form->getFieldValues();
-        $data['associated'] = $data['associated'] == null ? 0 : 1;
         $client->update($data);
 
         session()->flash('message', 'Cliente alterado com sucesso!');

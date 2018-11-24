@@ -22,9 +22,9 @@ Route::post('/admin/generateReport', 'ReportController@generateReport');
 Route::post('/admin/analiticReport', 'ReportController@generateAnaliticReport');
 Route::post('/admin/sellReport', 'ReportController@generateSellReport');
 Route::post('/admin/userReport', 'ReportController@generateUserReport');
-Route::post('/admin/singleUserReport', 'ReportController@generateSingleUserReport');
 Route::get('/admin/report', 'ReportController@index')->name('report');
 Route::post('/admin/addStock', 'ProductController@addStock');
+Route::post('/admin/decreaseStock', 'ProductController@decreaseStock');
 Route::get('/admin/stock', 'ProductController@stock')->name('estoque');
 Route::get('/removeItem','SellController@removeItem')->name('removeItem');
 Route::post('/home', 'SellController@addProducts');
@@ -34,14 +34,14 @@ Route::post('/cancelarVenda', 'SellController@cancelarVenda');
 
 Route::get('/home/{id}', function($id){
     $order = Order::find($id);
-    $categories = Category::all();
+    $categories = Category::all()->where('status','=',1);
     return view('/home', compact('order', 'categories'));
 });
 
 Route::post('/concluirVenda', 'SellController@concluirVenda');
 
 Route::get('/modal/{product_id?}',function($product_id){
-    $products = App\Models\Product::all()->where('brand_id', '=', $product_id);
+    $products = App\Models\Product::all()->where('brand_id', '=', $product_id)->where('status','=', 1);
     $brand = App\Models\Brand::find($product_id);
     $sellController = new \App\Http\Controllers\SellController();
     $tableHTML = $sellController->listaProdutosPorMarca($products);
@@ -70,9 +70,10 @@ Route::prefix('admin')->group(function(){
         Route::resource('products','ProductController');
         Route::resource('clients','ClientController');
         Route::resource('sells', 'SellController');
-	    Route::resource('providers', 'ProviderController');
-	    Route::resource('bonifications', 'BonificationController');
-	    Route::resource('cashes', 'CashController');
+        Route::resource('providers', 'ProviderController');
+        Route::resource('bonifications', 'BonificationController');
+        Route::resource('cashes', 'CashController');
+        Route::resource('company', 'CompanyController');
     });
 });
 
@@ -82,4 +83,13 @@ Route::get('/historyDetail', 'OrderHistoryController@show')->name('historyDetail
 Route::get('/upload', 'BrandController@upload');
 Route::post('/move', 'BrandController@move')->name('move');
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/createDesk', 'DeskController@createDesk')->name('createDesk');
+Route::get('/produtosComCodigos', 'ReportController@produtosComCodigos')->name('produtosComCodigos');
 Route::post('/cashes', 'CashController@fecharCaixa')->name('fecharCaixa');
+Route::post('/novaEntrada', 'CashController@novaEntrada')->name('novaEntrada');
+Route::post('/novaSaida', 'CashController@novaSaida')->name('novaSaida');
+Route::post('/vincularMesa', 'DeskController@vincularMesa')->name('vincularMesa');
+Route::post('/criarMesaVenda', 'DeskController@criarMesaVenda')->name('criarMesaVenda');
+Route::post('/excluirMesa', 'DeskController@excluirMesa')->name('excluirMesa');
+Route::post('/imprimirCupom', 'SellController@imprimirCupom')->name('imprimirCupom');
+Route::post('/dadosEmpresa', 'CompanyController@atualizar')->name('dadosEmpresa');

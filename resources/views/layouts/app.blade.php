@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ 'Conceito Tabacaria' }}</title>
+    <title>{{ 'MUT' }}</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -17,7 +17,7 @@
 <body>
 <div id="app">
     @php
-        $logo = asset('storage/images/brands/logo2.png');
+        $logo = asset('storage/images/logo456.jpg');
         $navbar = Navbar::withBrandImage($logo, route('home'), config('app.name'))->inverse();
          if(Auth::check()){
             if(Auth::user()->name == 'ADMIN'){
@@ -55,8 +55,7 @@
             else{
                 $arrayLinks = [
                         ['link' => route('admin.clients.index'), 'title' => 'Clientes'],
-                        ['link' => route('admin.cashes.index'), 'title' => 'Meu Caixa'],
-                        ['link' => route('report'), 'title' => 'Relatórios']
+                        ['link' => route('admin.cashes.index'), 'title' => 'Meu Caixa']
                     ];
             }
              $arrayLinksRight = [
@@ -64,10 +63,13 @@
                 Icon::user().' '.Auth::user()->name,
                 [
                     [
-                            'link' => route('logout'),
-                            'title' => 'Logout &ensp;'.Icon::create('log-out'),
-                            'linkAttributes' => [
-                                'onclick' => "event.preventDefault();getElementById(\"form-logout\").submit();"
+                            'link' => route('admin.company.index'),
+                            'title' => 'Configurações '.Icon::create('cog')
+                            ]
+                            ,[
+                                'link' => route('logout'),
+                                'title' => 'Logout &ensp;'.Icon::create('log-out'),
+                                'linkAttributes' => ['onclick' => "event.preventDefault();getElementById(\"form-logout\").submit();"
                             ]
                         ]
                     ]
