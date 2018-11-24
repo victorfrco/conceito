@@ -76,7 +76,7 @@
             @endif
         </div>
         <div class="row">
-            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); overflow: auto; margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
+            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
                 @php
                     foreach($categories as $category){
                         $brands = App\Models\Brand::all()->where('category_id', '=', $category->id)->where('status','=', 1);
@@ -174,18 +174,18 @@
                 }
             @endphp
         </div>
-        @if(\App\Desk::all()->where('status', '=', 1)->where('user_id','=',Auth::id())->isNotEmpty())
-            <div style="margin-left:-75px">Mesas:</div>
-        @endif
-        <div class="col-xs-7 col-sm-6 col-lg-7" style="max-height: 70px; min-width:1280px; margin-left:-90px;overflow-x: auto;white-space: nowrap;">
-            @php
-                if(App\Http\Controllers\CashController::buscaCaixaPorUsuario(\Illuminate\Support\Facades\Auth::id()) != null){
-                    echo '<a href="'.action("DeskController@createDesk").'">'.\Bootstrapper\Facades\Button::success('+')->addAttributes(['style' => 'height:39px ;width:50px;margin-right:9px']).'</a>';
-                    $deskController = new App\Http\Controllers\DeskController();
-                    echo $deskController->carregaMesas();
-                }
-            @endphp
-        </div>
+        {{--@if(\App\Desk::all()->where('status', '=', 1)->where('user_id','=',Auth::id())->isNotEmpty())--}}
+            {{--<div style="margin-left:-75px">Mesas:</div>--}}
+        {{--@endif--}}
+        {{--<div class="col-xs-7 col-sm-6 col-lg-7" style="max-height: 70px; min-width:1280px; margin-left:-90px;overflow-x: auto;white-space: nowrap;">--}}
+            {{--@php--}}
+                {{--if(App\Http\Controllers\CashController::buscaCaixaPorUsuario(\Illuminate\Support\Facades\Auth::id()) != null){--}}
+                    {{--echo '<a href="'.action("DeskController@createDesk").'">'.\Bootstrapper\Facades\Button::success('+')->addAttributes(['style' => 'height:39px ;width:50px;margin-right:9px']).'</a>';--}}
+                    {{--$deskController = new App\Http\Controllers\DeskController();--}}
+                    {{--echo $deskController->carregaMesas();--}}
+                {{--}--}}
+            {{--@endphp--}}
+        {{--</div>--}}
     </div>
 
     {{--vincularVendaMesa--}}

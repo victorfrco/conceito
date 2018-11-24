@@ -41,7 +41,7 @@
                         <input style="width: 90px" name="inicial_value" id="inicial_value">
 
                         <br><br>Informe a quantidade de mesas que deseja abrir:
-                        <input style="width: 90px" name="desks" id="desks">
+                        <input type="hidden" value = 0 style="width: 90px" name="desks" id="desks">
                     </label>
                 </div>
                 <div class="modal-footer">
