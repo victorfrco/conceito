@@ -7,15 +7,18 @@
             </div>
             {!! Form::open(array('action' => 'SellController@concluirVenda', 'method' => 'post', 'onsubmit' => 'return enviardadosT();')) !!}
             <div class="modal-body">
-                {{--<br><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p>
-                <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">
-                    {!! $users = App\User::all() !!}
-                    @foreach($users as $user)
-                        <option value="{{$user->id}}">{{$user->name}}</option>
-                    @endforeach
-                </select>--}}
-                <br>
                 <table class="table ">
+                    <tr>
+                        <td width="250px"><p style="display:inline; vertical-align: middle;font-weight: bold">Informe o vendedor: </p></td>
+                        <td width="250px">
+                            <select style="max-height: 50px; overflow: auto" class="selectpicker" data-live-search="true" name="user_id">
+                                {!! $users = App\User::all() !!}
+                                @foreach($users as $user)
+                                    <option value="{{$user->id}}">{{$user->name}}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                    </tr>
                     <tr>
                         <td width="250px"><p style="display:inline; vertical-align: middle;font-weight: bold">Forma de pagamento: </p></td>
                         <td width="250px">

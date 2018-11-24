@@ -76,7 +76,7 @@
             @endif
         </div>
         <div class="row">
-            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#000000; background-image:url({{asset('storage/images/brands/listaEsquerda.jpg')}});  margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
+            <div class="col-xs-7 col-sm-6 col-lg-8" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); overflow: auto; margin-left:-61px; border: solid; border-width: 1px; height: 450px;" id="tabsCategorias" data-url="<?= route('admin.categories.create') ?>">
                 @php
                     foreach($categories as $category){
                         $brands = App\Models\Brand::all()->where('category_id', '=', $category->id)->where('status','=', 1);
@@ -106,7 +106,7 @@
                     <h4 style="text-align: center; margin-top: 25%">Para iniciar clique em "Nova Venda" ou selecione uma mesa disponível!</h4>
                 @endif
             </div>
-            <div class="col-xs-5 col-sm-6 col-lg-5" style="background-color:#000000; background-image:url({{asset('storage/images/brands/listaEsquerda.jpg')}}); margin-right:-40px; border: solid; border-width: 1px; height: 450px; overflow: auto">
+            <div class="col-xs-5 col-sm-6 col-lg-5" style="background-color:#7a0f14; background-image:url({{asset('storage/images/brands/logo3.jpg')}}); margin-right:-40px; border: solid; border-width: 1px; height: 450px; overflow: auto">
                 @if(isset($order))
                         <div align="center" style="border-bottom: solid; border-width: 1px; border-color: #2F3133"> Produtos de
                             @php

@@ -1472,7 +1472,7 @@ textarea {
 a {
   color: #edb820;
   text-decoration: none;
-  text-shadow: 0.5px 0.5px 0.5px #0f0f0f;
+  text-shadow: 0.5px 0.5px 0.5px #811014;
 }
 
 a:hover,
@@ -5688,7 +5688,7 @@ tbody.collapse.in {
   margin-top: 0;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000), color-stop(100%, #515151)) !important;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#000000), color-stop(100%, #7a0f14)) !important;
 }
 
 .navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {
