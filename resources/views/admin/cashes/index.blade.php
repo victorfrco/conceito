@@ -20,7 +20,7 @@
                     echo \Bootstrapper\Facades\Button::INFO('<img src="https://png.icons8.com/metro/50/000000/money.png">  Dinheiro: '.\App\Http\Controllers\CashMovesController::buscaValoresDinheiro($caixa->id))->withAttributes(['data-toggle' => 'modal', 'data-target' => '#caixaDinheiro', 'style'=>'width: 230px; height:70px']).'<br><br>';
                     echo \Bootstrapper\Facades\Button::success('Entradas: '.\App\Http\Controllers\CashMovesController::buscaValoresEntradas($caixa->id))->large()->withAttributes(['style' => 'background-color: #99ffd6; color:black; width: 350px; height:70px'])->withAttributes(['data-toggle' => 'modal', 'data-target' => '#entradas']);
                     echo \Bootstrapper\Facades\Button::danger('Saídas: '.\App\Http\Controllers\CashMovesController::buscaValoresSaidas($caixa->id))->large()->withAttributes(['style' => 'background-color: #ff8080; color:black; width: 350px; height:70px'])->withAttributes(['data-toggle' => 'modal', 'data-target' => '#saidas']).'<BR><BR>';
-                    echo \Bootstrapper\Facades\Button::normal('Total: '.\App\Http\Controllers\CashMovesController::buscaValorTotal($caixa->id))->withAttributes(['style'=>'width: 700px; height:70px; color: black; font-size:40px; vertical-align:middle']).'<br><br>';
+                    echo \Bootstrapper\Facades\Button::normal('Total: '.\App\Http\Controllers\CashMovesController::buscaValoresDinheiro($caixa->id))->withAttributes(['style'=>'width: 700px; height:70px; color: black; font-size:40px; vertical-align:middle']).'<br><br>';
                     echo \Bootstrapper\Facades\Button::danger('Fechar Caixa')->withAttributes(['data-toggle' => 'modal', 'data-target' => '#fecharCaixaModal']);
                 }
             @endphp
