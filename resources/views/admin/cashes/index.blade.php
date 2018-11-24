@@ -40,7 +40,7 @@
                         Informe o valor atual do caixa (troco): R$
                         <input style="width: 90px" name="inicial_value" id="inicial_value">
 
-                        <br><br>Informe a quantidade de mesas que deseja abrir:
+                        {{--<br><br>Informe a quantidade de mesas que deseja abrir:--}}
                         <input type="hidden" value = 0 style="width: 90px" name="desks" id="desks">
                     </label>
                 </div>
