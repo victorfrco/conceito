@@ -74,6 +74,7 @@ class ReportController extends Controller
         $orderDao = new App\Dao\DaoOrder();
         $dados['qtdVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->count();
         $dados['vlrVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sum('absolut_total');
+        $dados['discount'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sum('discount');
         $dados['avgVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->avg('absolut_total');
         $dados['vendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), $request->get('user_id'), $final)->sortBy('status');
 
@@ -86,17 +87,44 @@ class ReportController extends Controller
         }
     }
 
-	public function generateAnaliticReport(Request $request){
-		$date  = $request->toArray()['date'];
-		$dados = $this->buscaEntradasESaidas( $date );
-		if ($dados['entradas']->count() == 0 && $dados['saidas']->count() == 0) {
-			$request->session()->flash('message', 'Não existe nenhuma entrada ou saída na data informada!');
-			return redirect()->route('report');
-		} else {
-			$pdf = PDF::loadView( 'admin.reports.analitic', compact( 'dados' ) );
-			return $pdf->download( 'Entradas e Saidas_' . $dados['data'] . '.pdf' );
-		}
-	}
+    public function generateSingleUserReport(Request $request){
+        //acrescenta 1 dia na data final para pegar o intervalo
+        $final = new \Carbon\Carbon($request->get('dateFinal'));
+        $final = $final->addDay();
+
+        $dataInicialFormatada = new \DateTime($request->get('dateInicial'));
+        $dataFinalFormatada = new \DateTime($request->get('dateFinal'));
+        $dados['dataInicial'] = $dataInicialFormatada->format('d/m/Y');
+        $dados['dataFinal'] = $dataFinalFormatada->format('d/m/Y');
+        $dados['user'] = App\User::find(\Auth::id())->name;
+
+        $orderDao = new App\Dao\DaoOrder();
+        $dados['qtdVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), \Auth::id(), $final)->count();
+        $dados['vlrVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), \Auth::id(), $final)->sum('absolut_total');
+        $dados['discount'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), \Auth::id(), $final)->sum('discount');
+        $dados['avgVendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), \Auth::id(), $final)->avg('absolut_total');
+        $dados['vendas'] = $orderDao->buscaVendasPorVendedor($request->get('dateInicial'), \Auth::id(), $final)->sortBy('status');
+
+        if ($dados['vendas']->count() == 0) {
+            $request->session()->flash('message', 'Não existe nenhuma venda de '.$dados['user'].' na data informada!');
+            return redirect()->route('report');
+        } else {
+            $pdf = PDF::loadView('admin.reports.ordersPerUser', compact('dados'));
+            return $pdf->download('Vendas_' . $dados['user'] . '.pdf');
+        }
+    }
+
+    public function generateAnaliticReport(Request $request){
+	    $date  = $request->toArray()['date'];
+	    $dados = $this->buscaEntradasESaidas( $date );
+	    if ($dados['entradas']->count() == 0 && $dados['saidas']->count() == 0) {
+		    $request->session()->flash('message', 'Não existe nenhuma entrada ou saída na data informada!');
+		    return redirect()->route('report');
+	    } else {
+		    $pdf = PDF::loadView( 'admin.reports.analitic', compact( 'dados' ) );
+		    return $pdf->download( 'Entradas e Saidas_' . $dados['data'] . '.pdf' );
+	    }
+    }
 
 	public function generateReport(Request $request) {
 		$date  = $request->toArray()['date'];
