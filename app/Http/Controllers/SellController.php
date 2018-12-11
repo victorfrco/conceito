@@ -233,7 +233,7 @@ class SellController extends Controller
                         <th>Cód - Nome</th>
                         <th style="text-align: center">Estoque</th>
                         <th style="text-align: center">Preço</th>
-                        <th style="text-align: center">Associado</th>
+                        <th style="text-align: center">Atacado</th>
                         <th style="text-align: center">Crédito</th>
                         <th style="text-align: center">Quantidade</th>
                     </tr>';
