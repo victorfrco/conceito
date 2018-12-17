@@ -41,15 +41,19 @@ class CashMovesController extends Controller
     }
 
     public static function buscaValorTotal($id){
-        $debito = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
-        $credito = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
-        $dinheiro = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
-        $entradas = CashMoves::all()->where('cash_id','=', $id)->where('type','=',CashMoves::getTIPOENTRADA())->sum('total');
+
+
+//        $debito = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
+//        $credito = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
+//        $dinheiro = \DB::select("select case when sum(cm.debit) IS null then 0 ELSE SUM(cm.debit) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.debit is not null and cm.cash_id = ".$id)[0]->valor;
+//        $entradas = CashMoves::all()->where('cash_id','=', $id)->where('type','=',CashMoves::getTIPOENTRADA())->sum('total');
+//        $saidas = CashMoves::all()->where('cash_id','=', $id)->whereIn('type',[CashMoves::getTIPOSAIDA(),CashMoves::getTIPODESCONTO()])->sum('total');
+//
+//        $total = $debito + $credito + $dinheiro + $entradas - $saidas;
+        $dinheiro = \DB::select("select case when sum(cm.money) IS null then 0 ELSE SUM(cm.money) end - case when sum(o.discount) IS null then 0 else sum(o.discount) end  as valor from cash_moves cm join orders o on o.id = cm.order_id where cm.type = 3 and cm.money is not null and cm.cash_id = ".$id);
         $saidas = CashMoves::all()->where('cash_id','=', $id)->whereIn('type',[CashMoves::getTIPOSAIDA(),CashMoves::getTIPODESCONTO()])->sum('total');
 
-        $total = $debito + $credito + $dinheiro + $entradas - $saidas;
-
-        return 'R$ '.number_format($total, 2,',', '.');
+        return 'R$ '.number_format($dinheiro[0]->valor - $saidas, 2,',', '.');
     }
 
 }
