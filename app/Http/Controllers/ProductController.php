@@ -111,7 +111,7 @@ class ProductController extends Controller
 //        $data['price_card'] = str_replace($source, $replace, $data['price_card']);
         $data['status'] = $data['status'] == null ? 0 : 1;
 
-        $teste = DB::table('products')->where('barcode','=', $data['barcode'])->count('*');
+        $teste = DB::table('products')->where('barcode','=', $data['barcode'])->where('barcode', '<>', "")->count('*');
         if($teste > 0) {
             session()->flash('message', 'Código de Barras já cadastrado em outro produto!');
             return redirect()
@@ -119,7 +119,11 @@ class ProductController extends Controller
                 ->withInput();
         }
 
-        Product::create($data);
+        $data = Product::create($data);
+        if($data->barcode == null) {
+            $data->barcode = $data->id;
+            $data->update();
+        }
 
         $request->session()->flash('message', 'Produto cadastrado com sucesso!');
         return redirect()->route('admin.products.index');
@@ -180,12 +184,16 @@ class ProductController extends Controller
         $data['price_card'] = Sell::converteMoedaParaDecimal($data['price_card']);
         $data['status'] = $data['status'] == null ? 0 : 1;
 
-        $teste = DB::table('products')->where('barcode','=', $data['barcode'])->where('id', '<>',$product->id)->count('*');
+        $teste = DB::table('products')->where('barcode','=', $data['barcode'])->where('barcode', '<>', "")->where('id', '<>',$product->id)->count('*');
         if($teste > 0) {
             session()->flash('message', 'Código de Barras já cadastrado em outro produto!');
             return redirect()
                 ->back()
                 ->withInput();
+        }
+
+        if($data['barcode'] == null) {
+            $data['barcode'] = $product->id;
         }
 
         $product->update($data);
